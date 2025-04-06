@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Premium Green/Cream Color Palette */
+    --background: 169 55% 11%; /* Rich deep teal #0A2E2A */
+    --foreground: 43 36% 93%; /* Cream #F5F1E6 */
+    --card: 169 57% 12%; /* Slightly lighter teal for cards */
+    --card-foreground: 43 36% 93%; /* Cream #F5F1E6 */
+    --popover: 169 57% 12%;
+    --popover-foreground: 43 36% 93%;
+    --primary: 164 94% 43%; /* Emerald Green #06D6A0 */
+    --primary-foreground: 169 60% 7%;
+    --secondary: 169 50% 15%;
+    --secondary-foreground: 43 36% 93%;
+    --muted: 169 40% 17%;
+    --muted-foreground: 43 25% 88%; /* Softer cream #EEE8D9 */
+    --accent: 164 94% 43%;
+    --accent-foreground: 169 60% 7%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 43 36% 93%;
+    --border: 169 35% 18%;
+    --input: 169 35% 18%;
+    --ring: 164 94% 43%;
+
+    /* Category colors */
+    --cloud-color: 173 67% 56%; /* Soft Cyan #4ECDC4 */
+    --dev-color: 155 57% 47%; /* Vibrant Green #34BE82 */
+    --ai-color: 173 54% 33%; /* Rich Teal #268980 */
+    --support-color: 27 84% 67%; /* Warm Amber #F4A261 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+}
+
+/* Custom styles */
+html {
+  scroll-behavior: smooth;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+
+/* Elevation system */
+.elevation-1 {
+  @apply bg-[#0C302C] shadow-sm;
+}
+
+.elevation-2 {
+  @apply bg-[#0E3230] shadow-md;
+}
+
+.elevation-3 {
+  @apply bg-[#103634] shadow-lg;
+}
+
+.elevation-4 {
+  @apply bg-[#123A38] shadow-xl;
+}
+
+.elevation-5 {
+  @apply bg-[#143E3C] shadow-2xl;
+}
+
+/* Subtle texture overlay */
+.texture-overlay {
+  position: relative;
+}
+
+.texture-overlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glow Effects */
+.glow-cream-xs {
+  text-shadow: 0 0 8px rgba(245, 241, 230, 0.3);
+}
+
+.glow-emerald-xs {
+  text-shadow: 0 0 8px rgba(6, 214, 160, 0.3);
+}
+
+.glow-emerald-sm {
+  text-shadow: 0 0 12px rgba(6, 214, 160, 0.4);
+}
+
