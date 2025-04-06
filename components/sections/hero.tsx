@@ -6,6 +6,7 @@ import { ArrowDown, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll"
 import { useWebGLSupport } from "@/hooks/use-webgl-support"
+import heroData from "@/data/hero.json" // Import the hero data JSON
 
 export default function Hero() {
   const { scrollToSection } = useSmoothScroll()
@@ -22,14 +23,15 @@ export default function Hero() {
   
   // State for typewriter effect
   const [roleIndex, setRoleIndex] = useState(0)
-  const roles = ["Cloud Engineer", "Web Developer", "AI Automation Enthusiast"]
+  // Use roles from the JSON data
+  const roles = heroData.role.titles
   
   useEffect(() => {
     const interval = setInterval(() => {
       setRoleIndex((prevIndex) => (prevIndex + 1) % roles.length)
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [roles.length]) // Added roles.length as a dependency
 
   // Staggered animation variants
   const containerVariants = {
@@ -86,7 +88,7 @@ export default function Hero() {
         >
           <motion.div variants={itemVariants} className="mb-2 flex justify-center sm:justify-start">
             <span className="px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium">
-              Welcome to my portfolio
+              {heroData.welcomeBadge}
             </span>
           </motion.div>
           
@@ -94,7 +96,7 @@ export default function Hero() {
             variants={itemVariants} 
             className="text-4xl md:text-6xl xl:text-7xl font-bold font-heading mb-4 text-center sm:text-left"
           >
-            Hi, I'm <span className="text-emerald">Anshuman</span>
+            {heroData.greeting.prefix} <span className="text-emerald">{heroData.greeting.name}</span>
           </motion.h1>
           
           <motion.div
@@ -102,7 +104,7 @@ export default function Hero() {
             className="text-2xl md:text-3xl font-medium mb-6 text-center sm:text-left"
           >
             <div className="h-12 flex items-center justify-center sm:justify-start">
-              <span className="mr-2">I'm a </span>
+              <span className="mr-2">{heroData.role.prefix}</span>
               <div className="relative h-10 overflow-hidden">
                 <div 
                   className="absolute transition-transform duration-500 ease-in-out flex flex-col"
@@ -129,7 +131,7 @@ export default function Hero() {
             variants={itemVariants}
             className="text-xl font-accent text-soft-cream mb-8 text-center sm:text-left"
           >
-            <span className="text-emerald">&lt;</span> Building efficient solutions for complex problems <span className="text-emerald">/&gt;</span>
+            <span className="text-emerald">{heroData.tagline.prefix}</span> {heroData.tagline.content} <span className="text-emerald">{heroData.tagline.suffix}</span>
           </motion.div>
 
           <motion.div
@@ -137,8 +139,7 @@ export default function Hero() {
             className="mb-12 text-soft-cream/90 max-w-2xl mx-auto sm:mx-0 text-center sm:text-left"
           >
             <p className="mb-4 leading-relaxed">
-              Specialized in cloud infrastructure, web development, and AI-powered automation. 
-              Passionate about creating efficient, scalable solutions that drive business growth.
+              {heroData.description}
             </p>
           </motion.div>
 
@@ -152,7 +153,7 @@ export default function Hero() {
                 onClick={() => scrollToSection("projects")} 
                 className="bg-emerald hover:bg-emerald/90 text-deep-teal font-medium rounded-full"
               >
-                View Projects <ArrowRight className="ml-2 h-4 w-4" />
+                {heroData.buttons.projects} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
             
@@ -163,7 +164,7 @@ export default function Hero() {
                 onClick={() => scrollToSection("contact")}
                 className="border-emerald/30 text-cream hover:text-emerald hover:bg-emerald/10 font-medium rounded-full"
               >
-                Contact Me
+                {heroData.buttons.contact}
               </Button>
             </motion.div>
           </motion.div>

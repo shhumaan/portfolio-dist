@@ -6,6 +6,16 @@ import { WorkflowComparison } from "@/components/ui/workflow-comparison"
 import { AIUseCase } from "@/components/ui/ai-use-case"
 import { MetricDisplay } from "@/components/ui/metric-display"
 import { Brain, MessageSquare, FileText, Workflow, Sparkles, Zap, LineChart } from "lucide-react"
+import aiShowcaseData from "@/data/aiShowcase.json"
+
+// Define a mapping of icon names to components
+const iconMap: Record<string, React.ReactNode> = {
+  MessageSquare: <MessageSquare className="h-8 w-8" />,
+  FileText: <FileText className="h-8 w-8" />,
+  Workflow: <Workflow className="h-8 w-8" />,
+  Brain: <Brain className="h-6 w-6" />,
+  Zap: <Zap className="h-6 w-6" />
+}
 
 export default function AIShowcase() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -42,11 +52,11 @@ export default function AIShowcase() {
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-16">
             <span className="inline-block px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium mb-4">
-              AI Integration
+              {aiShowcaseData.section.badge}
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-5 text-cream">AI Showcase</h2>
+            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-5 text-cream">{aiShowcaseData.section.title}</h2>
             <p className="text-soft-cream/80 max-w-2xl mx-auto text-lg">
-              Enhancing productivity through intelligent automation and AI-driven solutions
+              {aiShowcaseData.section.description}
             </p>
           </motion.div>
 
@@ -57,7 +67,7 @@ export default function AIShowcase() {
           <motion.div variants={itemVariants} className="mb-24">
             <h3 className="text-2xl md:text-3xl font-bold font-heading mb-12 text-center text-cream relative">
               <span className="relative inline-block">
-                Key AI Use Cases
+                {aiShowcaseData.useCases.title}
                 <motion.span
                   className="absolute -top-6 right-0 text-emerald"
                   initial={{ opacity: 0, y: 10, rotate: -5 }}
@@ -69,28 +79,21 @@ export default function AIShowcase() {
               </span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <AIUseCase
-                icon={<MessageSquare className="h-8 w-8" />}
-                title="ChatGPT for Debugging"
-                description="Accelerated troubleshooting by using ChatGPT to analyze error logs and suggest solutions, reducing resolution time by 40%."
-              />
-              <AIUseCase
-                icon={<FileText className="h-8 w-8" />}
-                title="Notion AI for Documentation"
-                description="Streamlined documentation process using Notion AI to generate and refine technical documentation, improving clarity and completeness."
-              />
-              <AIUseCase
-                icon={<Workflow className="h-8 w-8" />}
-                title="Custom GPT Workflows"
-                description="Developed specialized GPT workflows for ticket categorization and initial response generation, improving first-response time by 65%."
-              />
+              {aiShowcaseData.useCases.cases.map((useCase, index) => (
+                <AIUseCase
+                  key={index}
+                  icon={iconMap[useCase.icon]}
+                  title={useCase.title}
+                  description={useCase.description}
+                />
+              ))}
             </div>
           </motion.div>
 
           <motion.div variants={itemVariants}>
             <h3 className="text-2xl md:text-3xl font-bold font-heading mb-12 text-center text-cream relative">
               <span className="relative inline-block">
-                Impact Metrics
+                {aiShowcaseData.impact.title}
                 <motion.span
                   className="absolute -top-6 -right-6 text-emerald"
                   initial={{ opacity: 0, x: -10 }}
@@ -102,24 +105,15 @@ export default function AIShowcase() {
               </span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <MetricDisplay 
-                value={65} 
-                label="Faster first response" 
-                suffix="%" 
-                icon={<Zap className="h-6 w-6" />} 
-              />
-              <MetricDisplay
-                value={40}
-                label="Reduced debugging time"
-                suffix="%"
-                icon={<Brain className="h-6 w-6" />}
-              />
-              <MetricDisplay
-                value={30}
-                label="Documentation efficiency"
-                suffix="%"
-                icon={<FileText className="h-6 w-6" />}
-              />
+              {aiShowcaseData.impact.metrics.map((metric, index) => (
+                <MetricDisplay 
+                  key={index}
+                  value={metric.value} 
+                  label={metric.label} 
+                  suffix={metric.suffix} 
+                  icon={iconMap[metric.icon]} 
+                />
+              ))}
             </div>
           </motion.div>
         </motion.div>

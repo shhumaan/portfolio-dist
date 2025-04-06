@@ -9,6 +9,7 @@ import { SkillDetail } from "@/components/ui/skill-detail"
 import { SkillNetwork } from "@/components/ui/skill-network"
 import { SkillGalaxySimple } from "@/components/ui/skill-galaxy-simple"
 import { skills } from "@/data/skills"
+import skillsData from "@/data/skillsSection.json"
 import type { Skill, SkillCategory } from "@/types/skill"
 
 const categories: SkillCategory[] = ["all", "cloud", "development", "ai", "database", "system"]
@@ -50,11 +51,10 @@ export default function Skills() {
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4 text-cream">
-              Skills Visualization
+              {skillsData.section.title}
             </h2>
             <p className="text-soft-cream/80 max-w-xl mx-auto">
-              Interactive visualization of my technical expertise, with skills categorized and
-              sized by proficiency level. Choose visualization type and filter by category.
+              {skillsData.section.description}
             </p>
           </motion.div>
 
@@ -68,7 +68,7 @@ export default function Skills() {
                     : "text-soft-cream/80 hover:text-soft-cream"
                 }`}
               >
-                Network Graph
+                {skillsData.visualizationTypes.network.buttonLabel}
               </button>
               <button
                 onClick={() => setVisualizationType("category")}
@@ -78,7 +78,7 @@ export default function Skills() {
                     : "text-soft-cream/80 hover:text-soft-cream"
                 }`}
               >
-                Category View
+                {skillsData.visualizationTypes.category.buttonLabel}
               </button>
             </div>
             
@@ -121,16 +121,11 @@ export default function Skills() {
           >
             {visualizationType === "network" ? (
               <p>
-                This network visualization shows how my skills are interconnected, with links between related technologies.
-                The force-directed layout allows you to drag nodes to explore different arrangements, while node sizes
-                represent proficiency levels. Click any node to see detailed information.
+                {skillsData.visualizationTypes.network.description}
               </p>
             ) : (
               <p>
-                This visualization displays my skills grouped by category, with the size of each node
-                representing my proficiency level. The circular progress indicator shows the exact 
-                percentage proficiency for each skill. Click any skill to view detailed information
-                about my experience and related projects.
+                {skillsData.visualizationTypes.category.description}
               </p>
             )}
           </motion.div>

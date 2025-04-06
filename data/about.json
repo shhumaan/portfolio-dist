@@ -1,0 +1,93 @@
+{
+  "sectionBadge": "About Me",
+  "title": "Discover My Story",
+  "description": {
+    "riddleState": "Solve the riddles below to reveal different aspects of my professional journey",
+    "solvedState": "Cloud Engineer, Web Developer, and AI Automation Specialist"
+  },
+  "skipButton": {
+    "text": "Skip to Interview Contact",
+    "icon": "PhoneCall"
+  },
+  "riddles": [
+    {
+      "id": 1,
+      "icon": "Server",
+      "title": "Cloud Engineering",
+      "riddle": "I orchestrate containers, scale with ease, and keep your infrastructure running in the breeze. What AWS service am I?",
+      "answer": "eks",
+      "hintIcon": "Server",
+      "hint": "I manage Kubernetes clusters in the Amazon cloud.",
+      "explanation": "Cloud infrastructure is my specialty, particularly AWS EKS (Elastic Kubernetes Service). I've designed scalable and resilient architectures for enterprise applications."
+    },
+    {
+      "id": 2,
+      "icon": "Globe",
+      "title": "Web Development",
+      "riddle": "I bring reactivity without the library, keeping state in sync across the UI. What modern framework am I?",
+      "answer": "next.js",
+      "hintIcon": "Globe",
+      "hint": "I'm built on React but add server-side rendering and more.",
+      "explanation": "I specialize in Next.js development, creating performant web applications with server-side rendering, static site generation, and modern React patterns."
+    },
+    {
+      "id": 3,
+      "icon": "Cpu",
+      "title": "AI Automation",
+      "riddle": "I process language naturally, complete your code, and generate images too. What AI technology am I?",
+      "answer": "llm",
+      "hintIcon": "Brain",
+      "hint": "Large _____ Models are transforming how we interact with AI.",
+      "explanation": "I implement Large Language Models (LLMs) like GPT to automate processes, create intelligent systems, and enhance user experiences through natural language processing."
+    }
+  ],
+  "riddleUI": {
+    "solvedStatus": "Riddle Solved!",
+    "inputPlaceholder": "Enter your answer...",
+    "revealButton": "Reveal Answer"
+  },
+  "completedState": {
+    "icon": "Sparkles",
+    "title": {
+      "skipped": "Let's Schedule an Interview!",
+      "solved": "All Riddles Solved!"
+    },
+    "paragraphs": [
+      "I'm a passionate Cloud Engineer and Web Developer with a strong background in technical support and automation. My journey in technology has been driven by a desire to solve complex problems with elegant, efficient solutions.",
+      "With experience across cloud platforms, web development, and AI integration, I bring a versatile skill set to every project. I'm particularly interested in leveraging AI tools to enhance workflows and create more efficient systems."
+    ],
+    "interview": {
+      "title": "Contact for Interview",
+      "buttonText": "Schedule a Call",
+      "buttonIcon": "PhoneCall",
+      "description": "I'm currently available for new opportunities and would be happy to discuss potential projects."
+    }
+  },
+  "quote": {
+    "text": "Technology is most powerful when it empowers everyone. My goal is to build solutions that make complex systems accessible and efficient.",
+    "author": "Anshuman"
+  },
+  "achievements": {
+    "title": "Key Achievements",
+    "stats": [
+      {
+        "value": 95,
+        "label": "First-call resolution rate",
+        "suffix": "%"
+      },
+      {
+        "value": 20,
+        "label": "System downtime reduction",
+        "suffix": "%"
+      },
+      {
+        "value": 30,
+        "label": "Workflow efficiency improvement",
+        "suffix": "%"
+      }
+    ]
+  },
+  "journey": {
+    "title": "My Journey"
+  }
+} 

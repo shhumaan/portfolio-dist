@@ -1,0 +1,37 @@
+{
+  "section": {
+    "title": "Skills Visualization",
+    "description": "Interactive visualization of my technical expertise, with skills categorized and sized by proficiency level. Choose visualization type and filter by category."
+  },
+  "visualizationTypes": {
+    "network": {
+      "buttonLabel": "Network Graph",
+      "description": "This network visualization shows how my skills are interconnected, with links between related technologies. The force-directed layout allows you to drag nodes to explore different arrangements, while node sizes represent proficiency levels. Click any node to see detailed information."
+    },
+    "category": {
+      "buttonLabel": "Category View",
+      "description": "This visualization displays my skills grouped by category, with the size of each node representing my proficiency level. The circular progress indicator shows the exact percentage proficiency for each skill. Click any skill to view detailed information about my experience and related projects."
+    }
+  },
+  "skillDetail": {
+    "title": "Skill Details",
+    "emptyState": "Select a skill from the visualization to see details",
+    "labels": {
+      "proficiency": "Proficiency",
+      "experience": "Experience",
+      "description": "Description",
+      "myExperience": "My Experience",
+      "relatedProjects": "Related Projects",
+      "relatedSkills": "Related Skills"
+    },
+    "proficiencyLevels": {
+      "working": "Working",
+      "activeDevelopment": "Active Development",
+      "exploration": "Exploration"
+    },
+    "timeUnits": {
+      "singular": "year",
+      "plural": "years"
+    }
+  }
+} 

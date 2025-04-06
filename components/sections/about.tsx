@@ -6,8 +6,28 @@ import { StatCounter } from "@/components/ui/stat-counter"
 import { Timeline } from "@/components/ui/timeline"
 import { QuoteCallout } from "@/components/ui/quote-callout"
 import { experience } from "@/data/experience"
-import { Server, Globe, Cpu, PhoneCall, Sparkles, Brain, ArrowRight, Check } from "lucide-react"
+import * as LucideIcons from "lucide-react" // Import all icons
 import { Button } from "@/components/ui/button"
+import aboutData from "@/data/about.json" // Import the about data JSON
+
+// Define an interface for the props expected by DynamicIcon
+interface DynamicIconProps {
+  name: string;
+  className?: string;
+}
+
+// Create a component that will render the appropriate icon based on name
+const DynamicIcon = ({ name, className }: DynamicIconProps) => {
+  // Use type assertion to safely access the icon
+  const IconComponent = (LucideIcons as any)[name];
+  
+  if (!IconComponent) {
+    console.warn(`Icon ${name} not found`);
+    return null;
+  }
+  
+  return <IconComponent className={className} />;
+}
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -56,38 +76,8 @@ export default function About() {
     }
   }
 
-  const riddles = [
-    {
-      id: 1,
-      icon: <Server className="h-8 w-8 text-emerald" />,
-      title: "Cloud Engineering",
-      riddle: "I orchestrate containers, scale with ease, and keep your infrastructure running in the breeze. What AWS service am I?",
-      answer: "eks",
-      hintIcon: <Server className="text-emerald" />,
-      hint: "I manage Kubernetes clusters in the Amazon cloud.",
-      explanation: "Cloud infrastructure is my specialty, particularly AWS EKS (Elastic Kubernetes Service). I've designed scalable and resilient architectures for enterprise applications.",
-    },
-    {
-      id: 2,
-      icon: <Globe className="h-8 w-8 text-emerald" />,
-      title: "Web Development",
-      riddle: "I bring reactivity without the library, keeping state in sync across the UI. What modern framework am I?",
-      answer: "next.js",
-      hintIcon: <Globe className="text-emerald" />,
-      hint: "I'm built on React but add server-side rendering and more.",
-      explanation: "I specialize in Next.js development, creating performant web applications with server-side rendering, static site generation, and modern React patterns.",
-    },
-    {
-      id: 3,
-      icon: <Cpu className="h-8 w-8 text-emerald" />,
-      title: "AI Automation",
-      riddle: "I process language naturally, complete your code, and generate images too. What AI technology am I?",
-      answer: "llm",
-      hintIcon: <Brain className="text-emerald" />,
-      hint: "Large _____ Models are transforming how we interact with AI.",
-      explanation: "I implement Large Language Models (LLMs) like GPT to automate processes, create intelligent systems, and enhance user experiences through natural language processing.",
-    },
-  ]
+  // Use riddles from JSON data
+  const riddles = aboutData.riddles
 
   const handleSolveRiddle = (id: number) => {
     if (!riddlesSolved.includes(id)) {
@@ -119,13 +109,13 @@ export default function About() {
         >
           <motion.div variants={itemVariants} className="text-center mb-12">
             <div className="inline-block px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium mb-4">
-              About Me
+              {aboutData.sectionBadge}
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Discover My Story</h2>
+            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">{aboutData.title}</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               {!skipRiddles && !isAllSolved 
-                ? "Solve the riddles below to reveal different aspects of my professional journey" 
-                : "Cloud Engineer, Web Developer, and AI Automation Specialist"}
+                ? aboutData.description.riddleState 
+                : aboutData.description.solvedState}
             </p>
           </motion.div>
 
@@ -137,8 +127,8 @@ export default function About() {
                   className="border-emerald/30 text-emerald hover:bg-emerald/10 group flex items-center gap-2"
                   onClick={handleSkipToInterview}
                 >
-                  <PhoneCall className="h-4 w-4 group-hover:animate-pulse" />
-                  <span>Skip to Interview Contact</span>
+                  <DynamicIcon name={aboutData.skipButton.icon} className="h-4 w-4 group-hover:animate-pulse" />
+                  <span>{aboutData.skipButton.text}</span>
                 </Button>
               </div>
               
@@ -163,7 +153,7 @@ export default function About() {
                           ? "bg-emerald/20" 
                           : "bg-elevation-3"
                       } flex items-center justify-center mb-4`}>
-                        {riddle.icon}
+                        <DynamicIcon name={riddle.icon} className="h-8 w-8 text-emerald" />
                       </div>
                       
                       <h3 className="text-xl font-bold mb-3 text-cream">{riddle.title}</h3>
@@ -172,9 +162,9 @@ export default function About() {
                         <div>
                           <div className="flex items-center justify-center mb-2">
                             <span className="w-5 h-5 rounded-full bg-emerald/20 flex items-center justify-center mr-1">
-                              <Check className="h-3 w-3 text-emerald" />
+                              <DynamicIcon name="Check" className="h-3 w-3 text-emerald" />
                             </span>
-                            <p className="text-emerald text-sm font-medium">Riddle Solved!</p>
+                            <p className="text-emerald text-sm font-medium">{aboutData.riddleUI.solvedStatus}</p>
                           </div>
                           <p className="text-soft-cream/80">{riddle.explanation}</p>
                         </div>
@@ -190,14 +180,14 @@ export default function About() {
                           className="mt-4 w-full"
                         >
                           <div className="flex items-center space-x-2 mb-3 bg-elevation-3 rounded-lg p-3">
-                            {riddle.hintIcon}
+                            <DynamicIcon name={riddle.hintIcon} className="text-emerald" />
                             <p className="text-soft-cream/90 text-sm">{riddle.hint}</p>
                           </div>
                           
                           <div className="flex flex-col space-y-2">
                             <input 
                               type="text" 
-                              placeholder="Enter your answer..."
+                              placeholder={aboutData.riddleUI.inputPlaceholder}
                               className="p-2 rounded-lg bg-elevation-3 border border-elevation-1 text-cream focus:border-emerald/50 focus:ring-emerald/20"
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
@@ -214,7 +204,7 @@ export default function About() {
                               className="border-emerald/30 text-emerald hover:bg-emerald/10"
                               onClick={() => handleSolveRiddle(riddle.id)}
                             >
-                              Reveal Answer
+                              {aboutData.riddleUI.revealButton}
                             </Button>
                           </div>
                         </motion.div>
@@ -233,39 +223,32 @@ export default function About() {
             >
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 rounded-full bg-emerald/20 flex items-center justify-center">
-                  <Sparkles className="h-8 w-8 text-emerald" />
+                  <DynamicIcon name={aboutData.completedState.icon} className="h-8 w-8 text-emerald" />
                 </div>
               </div>
               
               <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-cream">
-                {skipRiddles ? "Let's Schedule an Interview!" : "All Riddles Solved!"}
+                {skipRiddles ? aboutData.completedState.title.skipped : aboutData.completedState.title.solved}
               </h3>
               
               <div className="space-y-6">
-                <p className="text-soft-cream/90">
-              I'm a passionate Cloud Engineer and Web Developer with a strong background in technical support and
-              automation. My journey in technology has been driven by a desire to solve complex problems with elegant,
-              efficient solutions.
-            </p>
-                <p className="text-soft-cream/90">
-              With experience across cloud platforms, web development, and AI integration, I bring a versatile skill set
-              to every project. I'm particularly interested in leveraging AI tools to enhance workflows and create more
-              efficient systems.
-            </p>
+                {aboutData.completedState.paragraphs.map((paragraph, index) => (
+                  <p key={index} className="text-soft-cream/90">{paragraph}</p>
+                ))}
                 
                 {skipRiddles && (
                   <div className="mt-6 pt-6 border-t border-elevation-1">
-                    <h4 className="text-lg font-medium mb-3 text-cream">Contact for Interview</h4>
+                    <h4 className="text-lg font-medium mb-3 text-cream">{aboutData.completedState.interview.title}</h4>
                     <div className="flex flex-col md:flex-row gap-4 items-center">
                       <Button 
                         className="bg-emerald hover:bg-emerald/90 text-deep-teal w-full md:w-auto shadow-[0_2px_10px_rgba(6,214,160,0.3)]"
                         onClick={() => window.location.href = "#contact"}
                       >
-                        <PhoneCall className="h-4 w-4 mr-2" />
-                        Schedule a Call
+                        <DynamicIcon name={aboutData.completedState.interview.buttonIcon} className="h-4 w-4 mr-2" />
+                        {aboutData.completedState.interview.buttonText}
                       </Button>
                       <p className="text-sm text-soft-cream/70">
-                        I'm currently available for new opportunities and would be happy to discuss potential projects.
+                        {aboutData.completedState.interview.description}
                       </p>
                     </div>
                   </div>
@@ -278,33 +261,34 @@ export default function About() {
             <div className="bg-elevation-2 rounded-xl p-8 border border-elevation-1 shadow-lg relative overflow-hidden">
               <div className="absolute right-0 bottom-0 w-32 h-32 bg-emerald/5 rounded-full blur-3xl -mr-10 -mb-10"></div>
               <div className="text-lg md:text-xl text-cream/90 italic font-medium">
-            <QuoteCallout
-              quote="Technology is most powerful when it empowers everyone. My goal is to build solutions that make complex systems accessible and efficient."
-              author="Anshuman"
-            />
+                <QuoteCallout
+                  quote={aboutData.quote.text}
+                  author={aboutData.quote.author}
+                />
               </div>
             </div>
           </motion.div>
 
           <motion.div variants={itemVariants} className="mb-16">
-            <h3 className="text-2xl font-bold font-heading mb-6 text-cream">Key Achievements</h3>
+            <h3 className="text-2xl font-bold font-heading mb-6 text-cream">{aboutData.achievements.title}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-elevation-2 rounded-xl p-6 border border-elevation-1 shadow-lg">
-              <StatCounter value={95} label="First-call resolution rate" suffix="%" duration={2000} />
-              </div>
-              <div className="bg-elevation-2 rounded-xl p-6 border border-elevation-1 shadow-lg">
-              <StatCounter value={20} label="System downtime reduction" suffix="%" duration={2000} />
-              </div>
-              <div className="bg-elevation-2 rounded-xl p-6 border border-elevation-1 shadow-lg">
-              <StatCounter value={30} label="Workflow efficiency improvement" suffix="%" duration={2000} />
-              </div>
+              {aboutData.achievements.stats.map((stat, index) => (
+                <div key={index} className="bg-elevation-2 rounded-xl p-6 border border-elevation-1 shadow-lg">
+                  <StatCounter 
+                    value={stat.value} 
+                    label={stat.label} 
+                    suffix={stat.suffix} 
+                    duration={2000} 
+                  />
+                </div>
+              ))}
             </div>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-2xl font-bold font-heading mb-6 text-cream">My Journey</h3>
+            <h3 className="text-2xl font-bold font-heading mb-6 text-cream">{aboutData.journey.title}</h3>
             <div className="bg-elevation-2 rounded-xl p-6 border border-elevation-1 shadow-lg">
-            <Timeline items={experience} />
+              <Timeline items={experience} />
             </div>
           </motion.div>
         </motion.div>

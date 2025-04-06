@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import type { Skill } from "@/types/skill"
+import skillsData from "@/data/skillsSection.json" // Import the skills section data
 
 type SkillDetailProps = {
   skill: Skill | null
@@ -19,16 +20,16 @@ export function SkillDetail({ skill }: SkillDetailProps) {
 
   const mapProficiency = (proficiency: string | number): string => {
     if (typeof proficiency === 'string') {
-      if (proficiency === 'Advanced') return 'Working';
-      if (proficiency === 'Intermediate') return 'Active Development';
-      return 'Exploration';
+      if (proficiency === 'Advanced') return skillsData.skillDetail.proficiencyLevels.working;
+      if (proficiency === 'Intermediate') return skillsData.skillDetail.proficiencyLevels.activeDevelopment;
+      return skillsData.skillDetail.proficiencyLevels.exploration;
     }
     
     // If numeric
     const num = Number(proficiency);
-    if (num >= 80) return 'Working';
-    if (num >= 50) return 'Active Development';
-    return 'Exploration';
+    if (num >= 80) return skillsData.skillDetail.proficiencyLevels.working;
+    if (num >= 50) return skillsData.skillDetail.proficiencyLevels.activeDevelopment;
+    return skillsData.skillDetail.proficiencyLevels.exploration;
   }
 
   const renderSkillStatus = (skill: Skill) => {
@@ -53,7 +54,7 @@ export function SkillDetail({ skill }: SkillDetailProps) {
 
   return (
     <div className="bg-elevation-1 rounded-lg shadow-premium-md p-6 h-full flex flex-col">
-      <h3 className="text-xl font-heading font-semibold mb-4 text-cream">Skill Details</h3>
+      <h3 className="text-xl font-heading font-semibold mb-4 text-cream">{skillsData.skillDetail.title}</h3>
       
       <AnimatePresence mode="wait">
         {skill ? (
@@ -86,7 +87,7 @@ export function SkillDetail({ skill }: SkillDetailProps) {
             
             <div className="mb-6">
               <div className="mb-2 flex justify-between">
-                <span className="text-sm text-soft-cream/70">Proficiency</span>
+                <span className="text-sm text-soft-cream/70">{skillsData.skillDetail.labels.proficiency}</span>
                 <span className="text-sm font-medium text-soft-cream">{skill.proficiency}%</span>
               </div>
               <div className="h-2 bg-elevation-2 rounded-full overflow-hidden">
@@ -107,35 +108,39 @@ export function SkillDetail({ skill }: SkillDetailProps) {
 
             {skill.years && (
               <div className="mb-4">
-                <span className="text-sm text-soft-cream/70 font-medium">Experience</span>
+                <span className="text-sm text-soft-cream/70 font-medium">{skillsData.skillDetail.labels.experience}</span>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="w-6 h-6 flex items-center justify-center rounded-full bg-elevation-2 text-xs text-soft-cream">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-soft-cream">{skill.years} {skill.years === 1 ? 'year' : 'years'}</span>
+                  <span className="text-soft-cream">
+                    {skill.years} {skill.years === 1 
+                      ? skillsData.skillDetail.timeUnits.singular 
+                      : skillsData.skillDetail.timeUnits.plural}
+                  </span>
                 </div>
               </div>
             )}
 
             {skill.description && (
               <div className="mb-4">
-                <span className="text-sm text-soft-cream/70 font-medium">Description</span>
+                <span className="text-sm text-soft-cream/70 font-medium">{skillsData.skillDetail.labels.description}</span>
                 <p className="text-soft-cream mt-1 leading-relaxed text-sm">{skill.description}</p>
               </div>
             )}
 
             {skill.experience && (
               <div className="mb-4">
-                <span className="text-sm text-soft-cream/70 font-medium">My Experience</span>
+                <span className="text-sm text-soft-cream/70 font-medium">{skillsData.skillDetail.labels.myExperience}</span>
                 <p className="text-soft-cream mt-1 leading-relaxed text-sm">{skill.experience}</p>
               </div>
             )}
 
             {skill.projects && skill.projects.length > 0 && (
               <div className="mb-4">
-                <span className="text-sm text-soft-cream/70 font-medium">Related Projects</span>
+                <span className="text-sm text-soft-cream/70 font-medium">{skillsData.skillDetail.labels.relatedProjects}</span>
                 <ul className="mt-2 space-y-2">
                   {skill.projects.map((project) => (
                     <li key={project} className="flex items-start gap-2">
@@ -149,7 +154,7 @@ export function SkillDetail({ skill }: SkillDetailProps) {
 
             {skill.relatedSkills && skill.relatedSkills.length > 0 && (
               <div>
-                <span className="text-sm text-soft-cream/70 font-medium">Related Skills</span>
+                <span className="text-sm text-soft-cream/70 font-medium">{skillsData.skillDetail.labels.relatedSkills}</span>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {skill.relatedSkills.map((relId) => (
                     <span 
@@ -176,7 +181,7 @@ export function SkillDetail({ skill }: SkillDetailProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M12 22a10 10 0 110-20 10 10 0 010 20z" />
               </svg>
             </div>
-            <p className="text-sm">Select a skill from the visualization to see details</p>
+            <p className="text-sm">{skillsData.skillDetail.emptyState}</p>
           </motion.div>
         )}
       </AnimatePresence>

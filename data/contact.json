@@ -1,0 +1,67 @@
+{
+  "section": {
+    "badge": "Contact",
+    "title": "Let's Discuss Your Project",
+    "description": "Ready to elevate your project with cloud engineering, web development, or AI automation? I'd love to hear about your goals."
+  },
+  "form": {
+    "title": "Send a Message",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Your name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Your email address"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "What is this regarding?"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell me about your project or inquiry"
+      }
+    },
+    "preview": {
+      "title": "Preview"
+    },
+    "buttons": {
+      "submit": "Send Message",
+      "sending": "Sending"
+    }
+  },
+  "successMessage": {
+    "title": "Message Sent!",
+    "responseMessages": [
+      "Thanks for reaching out! I'll review your message shortly.",
+      "I appreciate your interest. I typically respond within 24 hours.",
+      "Your message has been received. I'll get back to you soon!",
+      "Thanks for contacting me. I look forward to discussing your project!"
+    ]
+  },
+  "contactInfo": {
+    "title": "Contact Information",
+    "email": {
+      "label": "Email",
+      "value": "contact@anshuman.dev"
+    },
+    "linkedin": {
+      "label": "LinkedIn",
+      "value": "linkedin.com/in/anshuman",
+      "url": "https://linkedin.com/in/anshuman"
+    },
+    "github": {
+      "label": "GitHub",
+      "value": "github.com/anshuman",
+      "url": "https://github.com/anshuman"
+    }
+  },
+  "availability": {
+    "title": "Available for Opportunities",
+    "description": "Currently open to freelance projects, consulting, and full-time positions in cloud engineering and AI development.",
+    "status": "Open to Work",
+    "responseTimePrefix": "Typical response time:"
+  }
+} 

@@ -1,0 +1,25 @@
+{
+  "welcomeBadge": "Welcome to my portfolio",
+  "greeting": {
+    "prefix": "Hi, I'm",
+    "name": "Anshuman"
+  },
+  "role": {
+    "prefix": "I'm a",
+    "titles": [
+      "Cloud Engineer",
+      "Web Developer",
+      "AI Automation Enthusiast"
+    ]
+  },
+  "tagline": {
+    "prefix": "<",
+    "content": "Building efficient solutions for complex problems",
+    "suffix": "/>"
+  },
+  "description": "Specialized in cloud infrastructure, web development, and AI-powered automation. Passionate about creating efficient, scalable solutions that drive business growth.",
+  "buttons": {
+    "projects": "View Projects",
+    "contact": "Contact Me"
+  }
+} 

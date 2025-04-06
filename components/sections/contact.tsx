@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import contactData from "@/data/contact.json" // Import contact data
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -19,13 +20,6 @@ const formSchema = z.object({
 })
 
 type FormValues = z.infer<typeof formSchema>
-
-const RESPONSE_MESSAGES = [
-  "Thanks for reaching out! I'll review your message shortly.",
-  "I appreciate your interest. I typically respond within 24 hours.",
-  "Your message has been received. I'll get back to you soon!",
-  "Thanks for contacting me. I look forward to discussing your project!",
-]
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -84,8 +78,9 @@ export default function Contact() {
       // Simulate AI typing response
       setAiTyping(true)
       
-      // Choose a random response message
-      const responseMessage = RESPONSE_MESSAGES[Math.floor(Math.random() * RESPONSE_MESSAGES.length)]
+      // Choose a random response message from the JSON data
+      const responseMessages = contactData.successMessage.responseMessages
+      const responseMessage = responseMessages[Math.floor(Math.random() * responseMessages.length)]
       
       // Simulate typing effect
       let displayedResponse = ""
@@ -147,10 +142,10 @@ export default function Contact() {
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-16">
             <div className="inline-block px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium mb-4">
-              Contact
+              {contactData.section.badge}
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">Let's Discuss Your Project</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Ready to elevate your project with cloud engineering, web development, or AI automation? I'd love to hear about your goals.</p>
+            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">{contactData.section.title}</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">{contactData.section.description}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
@@ -158,7 +153,7 @@ export default function Contact() {
               variants={itemVariants} 
               className="lg:col-span-3 bg-elevation-2 rounded-xl border border-elevation-1 shadow-lg p-8"
             >
-              <h3 className="text-xl font-bold mb-6 text-cream">Send a Message</h3>
+              <h3 className="text-xl font-bold mb-6 text-cream">{contactData.form.title}</h3>
               <AnimatePresence mode="wait">
                 {!formSubmitted ? (
                   <motion.div 
@@ -175,11 +170,11 @@ export default function Contact() {
                             name="name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-cream/90">Name</FormLabel>
+                                <FormLabel className="text-cream/90">{contactData.form.fields.name.label}</FormLabel>
                                 <FormControl>
                                   <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                                     <Input 
-                                      placeholder="Your name" 
+                                      placeholder={contactData.form.fields.name.placeholder} 
                                       {...field} 
                                       className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30" 
                                     />
@@ -195,11 +190,11 @@ export default function Contact() {
                             name="email"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-cream/90">Email</FormLabel>
+                                <FormLabel className="text-cream/90">{contactData.form.fields.email.label}</FormLabel>
                                 <FormControl>
                                   <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                                     <Input 
-                                      placeholder="Your email address" 
+                                      placeholder={contactData.form.fields.email.placeholder} 
                                       {...field} 
                                       className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30"
                                     />
@@ -216,11 +211,11 @@ export default function Contact() {
                           name="subject"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-cream/90">Subject</FormLabel>
+                              <FormLabel className="text-cream/90">{contactData.form.fields.subject.label}</FormLabel>
                               <FormControl>
                                 <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                                   <Input 
-                                    placeholder="What is this regarding?" 
+                                    placeholder={contactData.form.fields.subject.placeholder} 
                                     {...field} 
                                     className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30"
                                   />
@@ -236,11 +231,11 @@ export default function Contact() {
                           name="message"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-cream/90">Message</FormLabel>
+                              <FormLabel className="text-cream/90">{contactData.form.fields.message.label}</FormLabel>
                               <FormControl>
                                 <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                                   <Textarea 
-                                    placeholder="Tell me about your project or inquiry" 
+                                    placeholder={contactData.form.fields.message.placeholder} 
                                     className="min-h-40 bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30" 
                                     {...field} 
                                   />
@@ -260,7 +255,7 @@ export default function Contact() {
                           >
                             <div className="flex items-center mb-2">
                               <MessageSquare className="h-4 w-4 text-emerald mr-2" />
-                              <h4 className="text-sm font-medium text-cream/90">Preview</h4>
+                              <h4 className="text-sm font-medium text-cream/90">{contactData.form.preview.title}</h4>
                             </div>
                             <div className="flex">
                               <div className="w-8 h-8 rounded-full bg-emerald/20 flex-shrink-0 flex items-center justify-center mr-3 text-xs font-medium text-emerald">
@@ -284,7 +279,7 @@ export default function Contact() {
                           >
                             {isSubmitting ? (
                               <span className="flex items-center justify-center">
-                                <span className="mr-2">Sending</span>
+                                <span className="mr-2">{contactData.form.buttons.sending}</span>
                                 <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -292,7 +287,7 @@ export default function Contact() {
                               </span>
                             ) : (
                               <span className="flex items-center justify-center group">
-                                <span className="mr-2 group-hover:mr-3 transition-all duration-300">Send Message</span>
+                                <span className="mr-2 group-hover:mr-3 transition-all duration-300">{contactData.form.buttons.submit}</span>
                                 <Send className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                               </span>
                             )}
@@ -316,7 +311,7 @@ export default function Contact() {
                     >
                       <CheckCircle className="h-8 w-8 text-emerald" />
                     </motion.div>
-                    <h4 className="text-xl font-bold text-cream mb-2">Message Sent!</h4>
+                    <h4 className="text-xl font-bold text-cream mb-2">{contactData.successMessage.title}</h4>
                     
                     {/* AI Response */}
                     <div className="mt-6 p-4 rounded-lg bg-elevation-3 mb-4 text-left">
@@ -347,7 +342,7 @@ export default function Contact() {
 
             <motion.div variants={itemVariants} className="lg:col-span-2 flex flex-col justify-start gap-8">
               <div className="bg-elevation-2 rounded-xl border border-elevation-1 shadow-lg p-8 h-auto mb-8">
-                <h3 className="text-xl font-bold mb-6 text-cream">Contact Information</h3>
+                <h3 className="text-xl font-bold mb-6 text-cream">{contactData.contactInfo.title}</h3>
 
                 <div className="space-y-8">
                   <motion.div className="flex items-start group" whileHover={hoverScale}>
@@ -355,12 +350,12 @@ export default function Contact() {
                       <Mail className="h-5 w-5 text-emerald" />
                     </div>
                     <div>
-                      <h4 className="font-medium mb-1 text-cream">Email</h4>
+                      <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.email.label}</h4>
                       <a
-                        href="mailto:contact@anshuman.dev"
+                        href={`mailto:${contactData.contactInfo.email.value}`}
                         className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
                       >
-                        contact@anshuman.dev
+                        {contactData.contactInfo.email.value}
                       </a>
                     </div>
                   </motion.div>
@@ -370,14 +365,14 @@ export default function Contact() {
                       <Linkedin className="h-5 w-5 text-emerald" />
                     </div>
                     <div>
-                      <h4 className="font-medium mb-1 text-cream">LinkedIn</h4>
+                      <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.linkedin.label}</h4>
                       <a
-                        href="https://linkedin.com/in/anshuman"
+                        href={contactData.contactInfo.linkedin.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
                       >
-                        <span>linkedin.com/in/anshuman</span>
+                        <span>{contactData.contactInfo.linkedin.value}</span>
                         <ExternalLink className="h-3 w-3 ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       </a>
                     </div>
@@ -388,14 +383,14 @@ export default function Contact() {
                       <Github className="h-5 w-5 text-emerald" />
                     </div>
                     <div>
-                      <h4 className="font-medium mb-1 text-cream">GitHub</h4>
+                      <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.github.label}</h4>
                       <a
-                        href="https://github.com/anshuman"
+                        href={contactData.contactInfo.github.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
                       >
-                        <span>github.com/anshuman</span>
+                        <span>{contactData.contactInfo.github.value}</span>
                         <ExternalLink className="h-3 w-3 ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       </a>
                     </div>
@@ -405,7 +400,7 @@ export default function Contact() {
               
               <div className="bg-elevation-2 rounded-xl border border-elevation-1 shadow-lg p-8 relative overflow-hidden">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-cream">Available for Opportunities</h3>
+                  <h3 className="text-xl font-bold text-cream">{contactData.availability.title}</h3>
                   
                   {/* Current time display */}
                   <div className="flex items-center text-sm text-emerald">
@@ -414,15 +409,15 @@ export default function Contact() {
                   </div>
                 </div>
                 <p className="text-soft-cream/80 mb-4">
-                  Currently open to freelance projects, consulting, and full-time positions in cloud engineering and AI development.
+                  {contactData.availability.description}
                 </p>
                 <div className="flex flex-col gap-2 mt-4">
                   <div className="inline-block px-3 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium w-fit">
-                    Open to Work
+                    {contactData.availability.status}
                   </div>
                   <div className="text-xs text-soft-cream/60 flex items-center mt-2">
                     <Clock className="h-3 w-3 mr-1 text-emerald/70" />
-                    <span>Typical response time: {responseTime}</span>
+                    <span>{contactData.availability.responseTimePrefix} {responseTime}</span>
                   </div>
                 </div>
                 

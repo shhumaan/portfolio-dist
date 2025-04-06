@@ -1,0 +1,50 @@
+{
+  "section": {
+    "badge": "AI Integration",
+    "title": "AI Showcase",
+    "description": "Enhancing productivity through intelligent automation and AI-driven solutions"
+  },
+  "useCases": {
+    "title": "Key AI Use Cases",
+    "cases": [
+      {
+        "title": "ChatGPT for Debugging",
+        "description": "Accelerated troubleshooting by using ChatGPT to analyze error logs and suggest solutions, reducing resolution time by 40%.",
+        "icon": "MessageSquare"
+      },
+      {
+        "title": "Notion AI for Documentation",
+        "description": "Streamlined documentation process using Notion AI to generate and refine technical documentation, improving clarity and completeness.",
+        "icon": "FileText"
+      },
+      {
+        "title": "Custom GPT Workflows",
+        "description": "Developed specialized GPT workflows for ticket categorization and initial response generation, improving first-response time by 65%.",
+        "icon": "Workflow"
+      }
+    ]
+  },
+  "impact": {
+    "title": "Impact Metrics",
+    "metrics": [
+      {
+        "value": 65,
+        "label": "Faster first response",
+        "suffix": "%",
+        "icon": "Zap"
+      },
+      {
+        "value": 40,
+        "label": "Reduced debugging time",
+        "suffix": "%",
+        "icon": "Brain"
+      },
+      {
+        "value": 30,
+        "label": "Documentation efficiency",
+        "suffix": "%",
+        "icon": "FileText"
+      }
+    ]
+  }
+} 
