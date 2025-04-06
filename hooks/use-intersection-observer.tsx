@@ -10,18 +10,18 @@ interface UseIntersectionObserverProps {
   root?: Element | null
 }
 
-interface UseIntersectionObserverReturn {
-  ref: React.RefObject<Element>
+interface UseIntersectionObserverReturn<T extends Element> {
+  ref: React.RefObject<T | null>
   isInView: boolean
   wasEverInView: boolean
 }
 
-export function useIntersectionObserver({
+export function useIntersectionObserver<T extends Element = Element>({
   threshold = 0,
   rootMargin = "0px",
   root = null,
-}: UseIntersectionObserverProps = {}): UseIntersectionObserverReturn {
-  const ref = useRef<Element>(null)
+}: UseIntersectionObserverProps = {}): UseIntersectionObserverReturn<T> {
+  const ref = useRef<T>(null)
   const [isInView, setIsInView] = useState(false)
   const [wasEverInView, setWasEverInView] = useState(false)
 

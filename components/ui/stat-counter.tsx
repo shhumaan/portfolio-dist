@@ -13,7 +13,7 @@ interface StatCounterProps {
 
 export function StatCounter({ value, label, prefix = "", suffix = "", duration = 2000 }: StatCounterProps) {
   const [count, setCount] = useState(0)
-  const { ref, isInView } = useIntersectionObserver({ threshold: 0.5 })
+  const { ref, isInView } = useIntersectionObserver<HTMLDivElement>({ threshold: 0.5 })
   const countStarted = useRef(false)
 
   useEffect(() => {

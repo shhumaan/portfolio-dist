@@ -582,7 +582,7 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
             .attr("text-anchor", "middle")
             .attr("fill", "#cccccc")
             .attr("font-size", "10px")
-            .text(d => {
+            .text((d: any) => {
               const proficiency = typeof d.skill.proficiency === 'number' 
                 ? `${d.skill.proficiency}%` 
                 : d.skill.proficiency;
@@ -665,9 +665,9 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
 
       // Add the proficiency bar indicators at bottom of each node (small arc)
       node.append("path")
-        .attr("d", d => {
-          const profValue = typeof (d as NodeData).proficiency === 'number' ? (d as NodeData).proficiency / 100 : 0.5;
-          const radius = (d as NodeData).r - 2;
+        .attr("d", (d: NodeData) => {
+          const profValue = typeof d.proficiency === 'number' ? d.proficiency / 100 : 0.5;
+          const radius = d.r - 2;
           const startAngle = Math.PI * 0.8;
           const endAngle = Math.PI * 2.2 * profValue + startAngle;
           
@@ -679,8 +679,8 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
             
           return arc({}) || "";
         })
-        .attr("fill", d => {
-          const profValue = typeof (d as NodeData).proficiency === 'number' ? (d as NodeData).proficiency / 100 : 0.5;
+        .attr("fill", (d: NodeData) => {
+          const profValue = typeof d.proficiency === 'number' ? d.proficiency / 100 : 0.5;
           
           // Color based on proficiency
           if (profValue >= 0.8) return "#34BE82"; // Working - Vibrant Green
@@ -691,17 +691,17 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
       // Add the category indicators (small dot on top)
       node.append("circle")
         .attr("r", 5)
-        .attr("cy", d => -d.r + 5)
-        .attr("fill", d => categoryColors[d.category])
+        .attr("cy", (d: NodeData) => -d.r + 5)
+        .attr("fill", (d: NodeData) => categoryColors[d.category])
         .attr("stroke", "#000")
         .attr("stroke-width", 1);
         
       // Add text labels below nodes for full names
       node.append("text")
         .attr("class", "node-label")
-        .text(d => d.name)
+        .text((d: NodeData) => d.name)
         .attr("text-anchor", "middle")
-        .attr("dy", d => d.r + 15)
+        .attr("dy", (d: NodeData) => d.r + 15)
         .attr("fill", "#ffffff")
         .attr("font-size", "12px")
         .attr("font-weight", "normal")
@@ -777,15 +777,15 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
         .attr("transform", (_, i) => `translate(0, ${i * 30})`);
         
       profItems.append("circle")
-        .attr("r", d => d.r * 0.4)
-        .attr("cx", d => d.r * 0.4)
+        .attr("r", (d: any) => d.r * 0.4)
+        .attr("cx", (d: any) => d.r * 0.4)
         .attr("cy", 10)
         .attr("fill", "#4ECDC4");
         
       profItems.append("text")
-        .attr("x", d => d.r * 0.4 * 2 + 10)
+        .attr("x", (d: any) => d.r * 0.4 * 2 + 10)
         .attr("y", 14)
-        .text(d => d.label)
+        .text((d: any) => d.label)
         .attr("fill", "#ffffff")
         .attr("font-size", 12);
 
