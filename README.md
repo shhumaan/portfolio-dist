@@ -3,13 +3,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ![Portfolio Screenshot](public/screenshot.png) 
-**(IMPORTANT: Replace `public/screenshot.png` with the actual path to your portfolio screenshot!)**
+
 
 ## Overview
 
 This repository contains the code for my personal portfolio website (v2). It showcases my skills, projects, and experience as a Cloud Engineer, Web Developer, and AI enthusiast. The portfolio is built with modern web technologies, featuring a sleek design, smooth animations, interactive elements, and a dynamic theme switcher.
 
-**Live Demo:** [Link to Vercel Deployment] **(IMPORTANT: Replace with your Vercel link after deployment!)**
+**Live Demo:** https://anshumandev.cloud/
 
 ## Key Features
 
@@ -42,10 +42,9 @@ This repository contains the code for my personal portfolio website (v2). It sho
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git 
-    cd YOUR_REPO_NAME
+    git clone https://github.com/shhumaan/portfolio-dist.git
+    cd portfolio-dist
     ```
-    **(IMPORTANT: Replace `YOUR_USERNAME` and `YOUR_REPO_NAME`!)**
 
 2.  **Install dependencies:**
     ```bash
