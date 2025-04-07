@@ -8,6 +8,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useScrollPosition } from "@/hooks/use-scroll-position"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 
 const navItems = [
   { name: "Home", href: "#home" },
@@ -87,13 +88,13 @@ export default function Header() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
         isScrolled 
-          ? "bg-deep-teal/80 backdrop-blur-premium shadow-premium-sm" 
+          ? "bg-black/80 backdrop-blur-premium shadow-premium-sm" 
           : "bg-transparent"
       )}
     >
       {/* Scroll Progress Indicator */}
       <motion.div 
-        className="absolute top-0 left-0 right-0 h-[2px] bg-emerald origin-left z-10"
+        className="absolute top-0 left-0 right-0 h-[2px] bg-theme origin-left z-10"
         style={{ scaleX: scrollYProgress }}
       />
 
@@ -114,19 +115,19 @@ export default function Header() {
             animate="visible"
             variants={logoVariants}
           >
-            <span className="bg-gradient-to-r from-cream to-emerald bg-clip-text text-transparent group-hover:opacity-80 transition-opacity duration-300">
+            <span className="bg-gradient-to-r from-cream to-theme bg-clip-text text-transparent group-hover:opacity-80 transition-opacity duration-300">
               Anshuman
             </span>
-            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald to-cream transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-theme to-cream transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
           </motion.div>
           
           {/* Available for Opportunities Badge */}
           <motion.div 
-            className="hidden md:flex items-center px-2 py-1 bg-emerald/10 border border-emerald/30 rounded-full"
+            className="hidden md:flex items-center px-2 py-1 bg-theme/10 border border-theme/30 rounded-full"
             variants={availableBadgeVariants}
             animate="pulse"
           >
-            <span className="h-2 w-2 rounded-full bg-emerald mr-2"></span>
+            <span className="h-2 w-2 rounded-full bg-theme mr-2"></span>
             <span className="text-xs font-medium text-cream">Available for opportunities</span>
           </motion.div>
         </Link>
@@ -145,25 +146,40 @@ export default function Header() {
                 href={item.href} 
                 className="text-sm font-medium relative group"
               >
-                <span className="text-cream group-hover:text-emerald transition-colors duration-300">
+                <span className="text-cream group-hover:text-theme transition-colors duration-300">
                   {item.name}
                 </span>
-                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-emerald transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-theme transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </Link>
             </motion.div>
           ))}
+          
+          {/* Theme Switcher (Desktop) */}
+          <motion.div
+            custom={navItems.length}
+            initial="hidden"
+            animate="visible"
+            variants={menuItemVariants}
+          >
+            <ThemeSwitcher />
+          </motion.div>
         </nav>
 
         {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden text-cream hover:text-emerald hover:bg-deep-teal/50"
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Theme Switcher (Mobile) */}
+          <ThemeSwitcher />
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-cream hover:text-theme hover:bg-deep-teal/50"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -174,7 +190,7 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden bg-elevation-3 border-t border-emerald/10 backdrop-blur-premium"
+            className="md:hidden bg-elevation-3 border-t border-theme/10 backdrop-blur-premium"
           >
             <div className="container mx-auto px-4 py-6">
               <nav className="flex flex-col space-y-5">
@@ -190,8 +206,8 @@ export default function Header() {
                       className="text-lg font-medium py-2 flex items-center space-x-2 group"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald group-hover:w-3 transition-all duration-300"></span>
-                      <span className="text-cream group-hover:text-emerald transition-colors duration-300">
+                      <span className="h-1.5 w-1.5 rounded-full bg-theme group-hover:w-3 transition-all duration-300"></span>
+                      <span className="text-cream group-hover:text-theme transition-colors duration-300">
                         {item.name}
                       </span>
                     </Link>
@@ -203,9 +219,9 @@ export default function Header() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: navItems.length * 0.1, duration: 0.3 }}
-                  className="mt-4 flex items-center px-3 py-2 bg-emerald/10 border border-emerald/20 rounded-md"
+                  className="mt-4 flex items-center px-3 py-2 bg-theme/10 border border-theme/20 rounded-md"
                 >
-                  <span className="h-2 w-2 rounded-full bg-emerald mr-2"></span>
+                  <span className="h-2 w-2 rounded-full bg-theme mr-2"></span>
                   <span className="text-sm font-medium text-cream">Available for opportunities</span>
                 </motion.div>
               </nav>

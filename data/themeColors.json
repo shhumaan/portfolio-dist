@@ -1,0 +1,40 @@
+{
+  "colors": [
+    {
+      "id": "emerald",
+      "name": "Emerald",
+      "value": "#06d6a0",
+      "tailwind": "emerald"
+    },
+    {
+      "id": "ruby",
+      "name": "Ruby",
+      "value": "#e63946",
+      "tailwind": "ruby"
+    },
+    {
+      "id": "amber",
+      "name": "Amber",
+      "value": "#fb8b24",
+      "tailwind": "amber"
+    },
+    {
+      "id": "sapphire",
+      "name": "Sapphire",
+      "value": "#3a86ff",
+      "tailwind": "sapphire"
+    },
+    {
+      "id": "onyx",
+      "name": "Onyx",
+      "value": "#2b2d42",
+      "tailwind": "onyx"
+    },
+    {
+      "id": "amethyst",
+      "name": "Amethyst",
+      "value": "#9d4edd",
+      "tailwind": "amethyst"
+    }
+  ]
+} 

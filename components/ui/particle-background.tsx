@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
 import * as THREE from "three"
 
 interface ParticleBackgroundProps {
@@ -9,50 +9,58 @@ interface ParticleBackgroundProps {
 
 export default function ParticleBackground({ containerRef }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [isMounted, setIsMounted] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const mousePositionRef = useRef({ x: 0, y: 0 })
 
-  // Only run on client-side after component is mounted
+  // --- Add back getThemeColor helper ---
+  function getThemeColor(variableName: string, fallbackColor: string = '#ffffff'): THREE.Color {
+    if (typeof window !== 'undefined') {
+      const colorString = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+      try {
+        if (colorString.includes(' ')) { 
+          const [h, s, l] = colorString.split(' ').map(parseFloat);
+          if (!isNaN(h) && !isNaN(s) && !isNaN(l)) {
+            const threeColor = new THREE.Color(`hsl(${h}, ${s}%, ${l}%)`);
+            return threeColor;
+          } else {
+            return new THREE.Color(fallbackColor);
+          }
+        } else {
+          const threeColor = new THREE.Color(colorString || fallbackColor);
+          return threeColor;
+        }
+      } catch (e) {
+        return new THREE.Color(fallbackColor);
+      }
+    } 
+    return new THREE.Color(fallbackColor);
+  }
+  // -------------------------------------
+
+  // Mouse move effect
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // Update mouse position for particle interaction
-  useEffect(() => {
-    if (!isMounted) return
-
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
+      mousePositionRef.current = {
         x: (e.clientX / window.innerWidth) * 2 - 1,
         y: -(e.clientY / window.innerHeight) * 2 + 1
-      })
+      }
     }
-
     window.addEventListener('mousemove', handleMouseMove)
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-    }
-  }, [isMounted])
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
+  // Initialization effect
   useEffect(() => {
-    // Only initialize Three.js after component is mounted and refs are available
-    if (!isMounted || !canvasRef.current || !containerRef.current) return
-
-    // Scene setup
+    if (!canvasRef.current || !containerRef.current) return;
+    
+    // Scene, Camera, Renderer Setup
     const scene = new THREE.Scene()
-
-    // Camera setup
     const camera = new THREE.PerspectiveCamera(
       75,
       containerRef.current.clientWidth / containerRef.current.clientHeight,
       0.1,
       1000,
     )
-    // Position camera further back to see more of the scene
     camera.position.z = 8
-
-    // Renderer setup
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
       alpha: true,
@@ -61,9 +69,7 @@ export default function ParticleBackground({ containerRef }: ParticleBackgroundP
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-    // Particle setup - increase particle counts for fuller scene
-    const particleCount = window.innerWidth < 768 ? 1800 : 3500
-    const particleGeometry = new THREE.BufferGeometry()
+    // Particle Material
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.03,
       sizeAttenuation: true,
@@ -71,206 +77,196 @@ export default function ParticleBackground({ containerRef }: ParticleBackgroundP
       alphaMap: new THREE.TextureLoader().load("/particle.png"),
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      vertexColors: true,
+      vertexColors: true, // We still set vertex colors (to white)
     })
 
-    // Create particles
-    const positions = new Float32Array(particleCount * 3)
-    const colors = new Float32Array(particleCount * 3)
-    const velocities = new Float32Array(particleCount * 3)
-    const sizes = new Float32Array(particleCount)
+    // --- Define Gradient Particle Colors --- 
+    const themeColor = getThemeColor('--theme-color');
+    const whiteColor = new THREE.Color(0xffffff);
+    const dimWhiteColor = whiteColor.clone().multiplyScalar(0.7);
+    const particleColors = [
+      themeColor.clone(),
+      themeColor.clone().lerp(whiteColor, 0.3),
+      themeColor.clone().lerp(whiteColor, 0.6),
+      dimWhiteColor,
+      whiteColor.clone()
+    ];
+    // ---------------------------------------
 
-    // Define category colors based on our premium green/cream palette with more vibrant colors
-    const categoryColors = {
-      cloud: new THREE.Color(0x4ECDC4).multiplyScalar(1.2), // Brighter Cyan
-      development: new THREE.Color(0x34BE82).multiplyScalar(1.2), // Brighter Green
-      ai: new THREE.Color(0x268980).multiplyScalar(1.2), // Brighter Teal
-      support: new THREE.Color(0xF4A261).multiplyScalar(1.2), // Brighter Amber
-      emerald: new THREE.Color(0x06D6A0).multiplyScalar(1.2), // Brighter Emerald
-      accent1: new THREE.Color(0x8EE4AF).multiplyScalar(1.2), // Mint
-      accent2: new THREE.Color(0xEB5160).multiplyScalar(1.2), // Coral
-    }
+    // Particle Geometry & Groups
+    const particleCount = window.innerWidth < 768 ? 2500 : 5000
+    const particleGroup1 = new THREE.Group();
+    const particleGroup2 = new THREE.Group();
+    scene.add(particleGroup1);
+    scene.add(particleGroup2);
+    const geometry1 = new THREE.BufferGeometry();
+    const geometry2 = new THREE.BufferGeometry();
+    const particlesPerGroup = Math.floor(particleCount / 2);
+    const boundary = 15;
 
-    // Create streams of particles - increase stream count
-    const streamCount = 20
-    const particlesPerStream = Math.floor(particleCount / streamCount)
-    
-    for (let s = 0; s < streamCount; s++) {
-      // Generate a curved path for this stream using a seeded random approach
-      const curvePoints = []
-      const seed = s / streamCount; // Use stream index as seed for deterministic values
+    // Arrays for Group 1
+    const positions1 = new Float32Array(particlesPerGroup * 3);
+    const colors1 = new Float32Array(particlesPerGroup * 3);
+    const velocities1 = new Float32Array(particlesPerGroup * 3);
+    const sizes1 = new Float32Array(particlesPerGroup);
+    let group1Idx = 0;
+
+    // Arrays for Group 2
+    const positions2 = new Float32Array((particleCount - particlesPerGroup) * 3);
+    const colors2 = new Float32Array((particleCount - particlesPerGroup) * 3);
+    const velocities2 = new Float32Array((particleCount - particlesPerGroup) * 3);
+    const sizes2 = new Float32Array(particleCount - particlesPerGroup);
+    let group2Idx = 0;
+
+    // --- Populate Particle Data with RANDOM positions and velocities ---
+    for (let i = 0; i < particleCount; i++) {
+      // Random position within the boundary box
+      const posX = (Math.random() - 0.5) * boundary * 2;
+      const posY = (Math.random() - 0.5) * boundary * 2;
+      const posZ = (Math.random() - 0.5) * boundary * 2;
+
+      // Random velocity
+      const velX = (Math.random() - 0.5) * 0.015; // Adjust speed factor if needed
+      const velY = (Math.random() - 0.5) * 0.015;
+      const velZ = (Math.random() - 0.5) * 0.015;
       
-      // Generate "random" values that are actually deterministic based on the seed
-      const randomOffset1 = Math.sin(seed * 10) * 4;
-      const randomOffset2 = Math.cos(seed * 20) * 4;
-      const randomOffset3 = Math.sin(seed * 30) * 4;
+      // Assign color from gradient array
+      const color = particleColors[i % particleColors.length];
+      const variation = 0.85 + Math.random() * 0.15; // Slightly randomize brightness
+      const r = color.r * variation;
+      const g = color.g * variation;
+      const b = color.b * variation;
       
-      const startX = (s % 3 - 1) * 8 // Deterministic start position
-      const startY = (Math.floor(s / 4) - 1) * 8
-      const startZ = ((s + 2) % 4 - 1.5) * 8
-      
-      // Deterministic curve control points
-      const control1 = { 
-        x: startX + randomOffset1,
-        y: startY + randomOffset2, 
-        z: startZ + randomOffset3 
-      }
-      
-      const control2 = { 
-        x: control1.x + randomOffset2,
-        y: control1.y + randomOffset3, 
-        z: control1.z + randomOffset1 
-      }
-      
-      const endPoint = { 
-        x: control2.x + randomOffset3,
-        y: control2.y + randomOffset1, 
-        z: control2.z + randomOffset2 
-      }
-      
-      // Create cubic Bezier curve for this stream
-      const curve = new THREE.CubicBezierCurve3(
-        new THREE.Vector3(startX, startY, startZ),
-        new THREE.Vector3(control1.x, control1.y, control1.z),
-        new THREE.Vector3(control2.x, control2.y, control2.z),
-        new THREE.Vector3(endPoint.x, endPoint.y, endPoint.z)
-      )
-      
-      // Select a color for this stream
-      const categories = Object.keys(categoryColors) as Array<keyof typeof categoryColors>
-      const category = categories[s % categories.length]
-      const color = categoryColors[category]
-      
-      // Place particles along the curve
-      for (let p = 0; p < particlesPerStream; p++) {
-        const i = s * particlesPerStream + p
-        const i3 = i * 3
-        
-        // Get position along curve (from 0 to 1)
-        const t = p / particlesPerStream
-        const pos = curve.getPoint(t)
-        
-        // Position
-        positions[i3] = pos.x
-        positions[i3 + 1] = pos.y
-        positions[i3 + 2] = pos.z
-        
-        // Color with slight variation - use deterministic variation
-        const variation = 0.85 + ((p * s) % 10) / 100;
-        colors[i3] = color.r * variation
-        colors[i3 + 1] = color.g * variation
-        colors[i3 + 2] = color.b * variation
-        
-        // Velocity (direction along curve)
-        const nextT = Math.min(1, t + 0.01)
-        const nextPos = curve.getPoint(nextT)
-        velocities[i3] = (nextPos.x - pos.x) * 0.01
-        velocities[i3 + 1] = (nextPos.y - pos.y) * 0.01
-        velocities[i3 + 2] = (nextPos.z - pos.z) * 0.01
-        
-        // Size variation - deterministic
-        sizes[i] = (0.5 + ((i * 7) % 10) / 100) * 0.02
+      // Random base size
+      const size = (0.3 + Math.random() * 0.7) * 0.03;
+
+      // Assign to groups
+      if (i % 2 === 0 && group1Idx < particlesPerGroup) {
+        const idx3 = group1Idx * 3;
+        positions1[idx3] = posX; colors1[idx3] = r; velocities1[idx3] = velX;
+        positions1[idx3 + 1] = posY; colors1[idx3 + 1] = g; velocities1[idx3 + 1] = velY;
+        positions1[idx3 + 2] = posZ; colors1[idx3 + 2] = b; velocities1[idx3 + 2] = velZ;
+        sizes1[group1Idx] = size;
+        group1Idx++;
+      } else if (i % 2 !== 0 && group2Idx < (particleCount - particlesPerGroup)) {
+        const idx3 = group2Idx * 3;
+        positions2[idx3] = posX; colors2[idx3] = r; velocities2[idx3] = velX;
+        positions2[idx3 + 1] = posY; colors2[idx3 + 1] = g; velocities2[idx3 + 1] = velY;
+        positions2[idx3 + 2] = posZ; colors2[idx3 + 2] = b; velocities2[idx3 + 2] = velZ;
+        sizes2[group2Idx] = size;
+        group2Idx++;
       }
     }
+    // ---------------------------------------------------------------------
 
-    particleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-    particleGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3))
-    particleGeometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1))
+    // Set Geometry Attributes
+    geometry1.setAttribute("position", new THREE.BufferAttribute(positions1, 3));
+    geometry1.setAttribute("color", new THREE.BufferAttribute(colors1, 3));
+    geometry1.setAttribute("velocity", new THREE.BufferAttribute(velocities1, 3));
+    geometry1.setAttribute("baseSize", new THREE.BufferAttribute(sizes1, 1));
+    const particles1 = new THREE.Points(geometry1, particlesMaterial);
+    particleGroup1.add(particles1);
 
-    // Create particle system
-    const particles = new THREE.Points(particleGeometry, particlesMaterial)
-    scene.add(particles)
+    geometry2.setAttribute("position", new THREE.BufferAttribute(positions2, 3));
+    geometry2.setAttribute("color", new THREE.BufferAttribute(colors2, 3));
+    geometry2.setAttribute("velocity", new THREE.BufferAttribute(velocities2, 3));
+    geometry2.setAttribute("baseSize", new THREE.BufferAttribute(sizes2, 1));
+    const particles2 = new THREE.Points(geometry2, particlesMaterial);
+    particleGroup2.add(particles2);
 
-    // Animation
+    // Animation loop
+    let animationFrameId: number | null = null;
     const animate = () => {
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
+      if (!renderer || !scene || !camera || !particleGroup1 || !particleGroup2) return;
 
-      // Time-based pulsing effect
       const time = Date.now() * 0.001;
-      const pulseScale = Math.sin(time * 0.5) * 0.2 + 1;
       
-      // Update particle sizes for pulsing effect
-      const sizeAttribute = particleGeometry.getAttribute('size') as THREE.BufferAttribute;
-      for (let i = 0; i < particleCount; i++) {
-        const baseSize = (0.5 + ((i * 7) % 10) / 100) * 0.02;
-        // Add subtle variation based on particle's position in stream
-        const streamPosition = (i % particlesPerStream) / particlesPerStream;
-        const pulseFactor = 1 + Math.sin(time + streamPosition * Math.PI * 2) * 0.15;
-        sizeAttribute.array[i] = baseSize * pulseFactor;
-      }
-      sizeAttribute.needsUpdate = true;
-      
-      // Update particle positions along their stream path
-      const positions = particleGeometry.attributes.position.array as Float32Array
-      
-      for (let i = 0; i < particleCount; i++) {
-        const i3 = i * 3
-        
-        // Move particle along its velocity vector
-        positions[i3] += velocities[i3]
-        positions[i3 + 1] += velocities[i3 + 1]
-        positions[i3 + 2] += velocities[i3 + 2]
-        
-        // Add subtle mouse influence
-        positions[i3] += mousePosition.x * 0.0005
-        positions[i3 + 1] += mousePosition.y * 0.0005
-        
-        // If particle reaches end of stream, loop back to beginning of stream
-        // This creates an infinite flowing stream effect
-        const streamIndex = Math.floor(i / particlesPerStream)
-        const particleInStreamIndex = i % particlesPerStream
-        
-        if (particleInStreamIndex === particlesPerStream - 1) {
-          const startParticleIndex = streamIndex * particlesPerStream
-          const startIndex3 = startParticleIndex * 3
-          
-          positions[i3] = positions[startIndex3]
-          positions[i3 + 1] = positions[startIndex3 + 1]
-          positions[i3 + 2] = positions[startIndex3 + 2]
+      // Update Group Function with Boundary WRAPPING
+      function updateGroup(group: THREE.Group | null, velocities: Float32Array | null) {
+        if (!group) return;
+        const particles = group.children[0] as THREE.Points;
+        if (!particles || !particles.geometry || !velocities) return;
+
+        const positions = particles.geometry.getAttribute('position') as THREE.BufferAttribute;
+        const baseSizes = particles.geometry.getAttribute('baseSize') as THREE.BufferAttribute;
+        let sizes = particles.geometry.getAttribute('size') as THREE.BufferAttribute;
+        if (!sizes || sizes.array.length !== baseSizes.count) {
+            sizes = new THREE.BufferAttribute(new Float32Array(baseSizes.count), 1);
+            particles.geometry.setAttribute('size', sizes);
         }
+        
+        for (let i = 0; i < positions.count; i++) {
+          const i3 = i * 3;
+          
+          // Pulsing Size (Subtler pulse)
+          const baseSize = baseSizes.array[i];
+          const pulseFactor = 1 + Math.sin(time * 0.5 + i * 0.1) * 0.05; // Slower, less intense pulse
+          sizes.array[i] = baseSize * pulseFactor;
+
+          // Update Position based on velocity
+          positions.array[i3] += velocities[i3];
+          positions.array[i3 + 1] += velocities[i3 + 1];
+          positions.array[i3 + 2] += velocities[i3 + 2];
+          
+          /* --- Temporarily Disable Mouse Influence --- 
+          positions.array[i3] += mousePositionRef.current.x * 0.0005;
+          positions.array[i3 + 1] += mousePositionRef.current.y * 0.0005;
+          */
+          
+          // Boundary Wrapping Logic
+           if (positions.array[i3] > boundary) positions.array[i3] = -boundary;
+           if (positions.array[i3] < -boundary) positions.array[i3] = boundary;
+           if (positions.array[i3 + 1] > boundary) positions.array[i3 + 1] = -boundary;
+           if (positions.array[i3 + 1] < -boundary) positions.array[i3 + 1] = boundary;
+           if (positions.array[i3 + 2] > boundary) positions.array[i3 + 2] = -boundary;
+           if (positions.array[i3 + 2] < -boundary) positions.array[i3 + 2] = boundary;
+        }
+        positions.needsUpdate = true;
+        sizes.needsUpdate = true;
       }
+
+      const velocitiesArr1 = geometry1.getAttribute('velocity')?.array as Float32Array | null;
+      const velocitiesArr2 = geometry2.getAttribute('velocity')?.array as Float32Array | null;
+      updateGroup(particleGroup1, velocitiesArr1);
+      updateGroup(particleGroup2, velocitiesArr2);
       
-      particleGeometry.attributes.position.needsUpdate = true
-      
-      // Slow gentle rotation of the entire scene
-      particles.rotation.y += 0.0005
-      // Add subtle rotation influence from mouse
-      particles.rotation.y += mousePosition.x * 0.0001
-      particles.rotation.x += mousePosition.y * 0.0001
+      /* --- Temporarily Disable Rotations --- 
+      particleGroup1.rotation.y += 0.0005 + mousePositionRef.current.x * 0.0001;
+      particleGroup1.rotation.x += mousePositionRef.current.y * 0.0001;
+      particleGroup2.rotation.y -= 0.0003 - mousePositionRef.current.x * 0.00005;
+      particleGroup2.rotation.x -= mousePositionRef.current.y * 0.00005;
+      */
       
       renderer.render(scene, camera)
     }
-    
     animate()
 
     // Handle resize
     const handleResize = () => {
-      if (!containerRef.current) return
-      
+      if (!containerRef.current || !camera || !renderer) return
       camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight
       camera.updateProjectionMatrix()
-      
       renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight)
     }
-    
     window.addEventListener("resize", handleResize)
     
     // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize)
-      
-      scene.remove(particles)
-      particleGeometry.dispose()
-      particlesMaterial.dispose()
-      renderer.dispose()
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      // Dispose Three.js objects
+      scene?.remove(particleGroup1);
+      scene?.remove(particleGroup2);
+      geometry1?.dispose(); 
+      geometry2?.dispose(); 
+      particlesMaterial?.dispose(); 
+      renderer?.dispose(); 
     }
-  }, [isMounted]) // Only run when isMounted changes to true
+  }, []);
 
-  // Render nothing on server, or canvas on client
-  if (!isMounted) {
-    return null;
-  }
-
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 

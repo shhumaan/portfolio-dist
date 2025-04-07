@@ -5,6 +5,7 @@ import "./globals.css"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import GlobalBackground from "@/components/ui/global-background"
+import { ThemeProvider } from "@/context/ThemeContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,12 +39,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark" suppressHydrationWarning={true}>
       <body className={`${inter.variable} ${outfit.variable} ${caveat.variable} font-body`} suppressHydrationWarning={true}>
-        <GlobalBackground />
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </div>
+        <ThemeProvider>
+          <GlobalBackground />
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

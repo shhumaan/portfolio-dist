@@ -2,14 +2,23 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true,
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   experimental: {
-    // Fixed experimental options according to Next.js 15.2.3 requirements
-    // Remove turbo and turbotrace options that are causing errors
+    optimizePackageImports: ['framer-motion', 'lucide-react'],
   },
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 4,
+  },
+  productionBrowserSourceMaps: false,
   webpack: (config) => {
-    // Simplify chunk splitting to avoid HMR issues
     config.optimization.splitChunks = {
       chunks: 'all',
       maxInitialRequests: 25,
@@ -17,7 +26,6 @@ const nextConfig = {
       cacheGroups: {
         default: false,
         vendors: false,
-        // Very important: create a separate chunk for node_modules
         framework: {
           name: 'framework',
           test: /[\\/]node_modules[\\/]/,

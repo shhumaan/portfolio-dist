@@ -64,6 +64,14 @@ const getNodeRadius = (proficiency: string | number): number => {
   }
 }
 
+// Utility function to get computed CSS variable value
+function getCSSVariableValue(variableName: string): string {
+  if (typeof window !== 'undefined') {
+    return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim() || '#000000';
+  }
+  return '#000000'; // Fallback for SSR or environments without window
+}
+
 export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizationType }: SkillNetworkProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -71,6 +79,8 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
   const [isMounted, setMounted] = useState(false)
   const [simulationRunning, setSimulationRunning] = useState(true)
   const simulationRef = useRef<d3.Simulation<NodeData, LinkData> | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [hasRendered, setHasRendered] = useState(false);
   
   // Set isMounted to true when component mounts on client
   useEffect(() => {
@@ -109,42 +119,38 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
     };
   }, []);
 
+  useEffect(() => {
+    const observer = new ResizeObserver(entries => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        setDimensions({ width, height });
+      }
+    });
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dimensions.width > 0 && dimensions.height > 0) {
+      setHasRendered(true);
+    } else if (containerRef.current?.clientWidth && containerRef.current?.clientHeight) {
+       setDimensions({ width: containerRef.current.clientWidth, height: containerRef.current.clientHeight });
+       setHasRendered(true);
+    }
+  }, [dimensions]);
+
   // Render the network visualization
   useEffect(() => {
-    if (!isMounted || !svgRef.current || !containerRef.current || skills.length === 0 || visualizationType !== "network") {
-      console.log("Not rendering network:", { 
-        isMounted, 
-        hasSvgRef: !!svgRef.current, 
-        hasContainerRef: !!containerRef.current, 
-        skillsLength: skills.length, 
-        visualizationType 
-      });
+    if (!hasRendered || !svgRef.current || !containerRef.current || skills.length === 0 || visualizationType !== "network") {
       return;
     }
 
-    console.log("Rendering network with skills:", skills.map(s => s.id));
-
-    // Clear previous content
-    d3.select(svgRef.current).selectAll("*").remove()
-
-    // Ensure container is properly sized before getting dimensions
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        if (entry.target === containerRef.current) {
-          console.log("Container resized:", entry.contentRect);
-          // Only redraw if we have actual dimensions
-          if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
-            renderNetworkGraph();
-          }
-        }
-      }
-    });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    // Render the network graph with current dimensions
     renderNetworkGraph();
 
     // Function to render the network graph
@@ -156,12 +162,9 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
       const height = containerRef.current.clientHeight;
 
       if (width === 0 || height === 0) {
-        console.log("Container has zero dimensions, delaying render");
         return;
       }
 
-      console.log("Container dimensions:", { width, height });
-      
       // Create SVG with zoom capabilities
       const svg = d3.select(svgRef.current)
         .attr("width", width)
@@ -193,7 +196,7 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
       // Initialize label visibility
       updateLabelsVisibility(null);
         
-      // Add subtle background pattern - deep teal with grid
+      // Add subtle background pattern - use CSS variables
       const defs = g.append("defs");
       const pattern = defs.append("pattern")
         .attr("id", "skill-grid-pattern")
@@ -204,7 +207,7 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
       pattern.append("path")
         .attr("d", "M 40 0 L 0 0 0 40")
         .attr("fill", "none")
-        .attr("stroke", "#0A2E2A")
+        .attr("stroke", getCSSVariableValue('--border') || '#333') // Use border color
         .attr("stroke-width", 0.5);
 
       // Apply pattern to background
@@ -213,16 +216,16 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
         .attr("height", height * 4)
         .attr("x", -width * 2)
         .attr("y", -height * 2)
-        .attr("fill", "#0A2E2A")
-        .attr("opacity", 1);
-        
-      g.append("rect")
-        .attr("width", width * 4) 
+        .attr("fill", `url(#skill-grid-pattern)`) 
+        .attr("opacity", 0.5); // Add slight opacity to the grid
+
+      // Append a solid background rectangle behind the pattern
+      g.insert("rect", ":first-child")
+        .attr("width", width * 4)
         .attr("height", height * 4)
         .attr("x", -width * 2)
         .attr("y", -height * 2)
-        .attr("fill", "url(#skill-grid-pattern)")
-        .attr("opacity", 0.2);
+        .attr("fill", getCSSVariableValue('--background') || '#000'); // Use background color
 
       // Define simulation nodes with types
       const nodes: NodeData[] = skills.map(skill => ({
@@ -914,24 +917,7 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
         highlightConnections("");
       });
     }
-    
-    // Clean up function
-    return () => {
-      if (resizeObserver) {
-        if (containerRef.current) {
-          resizeObserver.unobserve(containerRef.current);
-        }
-        resizeObserver.disconnect();
-      }
-      
-      // Stop any running simulations using the ref
-      if (simulationRef.current) {
-        simulationRef.current.stop();
-      }
-      
-      setSimulationRunning(false);
-    };
-  }, [isMounted, visualizationType, skills, onSelectSkill, selectedSkill, simulationRunning]);
+  }, [hasRendered, visualizationType, skills, onSelectSkill, selectedSkill, simulationRunning]);
 
   // Get the selected skill from props and ensure it exists in our current skill set
   useEffect(() => {
@@ -1129,16 +1115,13 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
     );
   };
 
+  // Render check
+  if (!hasRendered) {
+    return <div ref={containerRef} className="w-full h-full flex items-center justify-center text-muted-foreground">Loading Visualization...</div>;
+  }
+
   return (
-    <div 
-      ref={containerRef} 
-      className="w-full h-full"
-      style={{ 
-        position: 'relative', 
-        minHeight: '500px',
-        overflow: 'hidden'
-      }}
-    >
+    <div ref={containerRef} className="w-full h-[600px] bg-background relative" id="skill-network-container">
       {visualizationType === "network" ? (
         <svg 
           ref={svgRef} 

@@ -18,7 +18,7 @@ export default function GlobalBackground() {
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden" ref={containerRef}>
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-deep-teal/30 to-elevation-5/80">
+      <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-background/30 to-background/80">
         <ParticleBackground containerRef={containerRef} />
       </div>
       

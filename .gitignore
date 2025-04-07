@@ -45,3 +45,4 @@ lerna-debug.log*
 
 # Docusaurus output
 .docusaurus
+.vercel

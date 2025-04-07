@@ -43,8 +43,13 @@ export default function Projects() {
   }
 
   return (
-    <section id="projects" ref={sectionRef} className="py-20 bg-elevation-0 texture-overlay">
-      <div className="container mx-auto px-4">
+    <section id="projects" ref={sectionRef} className="py-20 relative">
+      <div className="container mx-auto px-4 relative z-10 bg-card/80 backdrop-blur-sm rounded-lg shadow-premium-lg py-12 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_40px_8px_rgba(255,255,255,0.3)]">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
+          <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-theme/5 blur-3xl opacity-50"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-64 h-64 rounded-full bg-theme/3 blur-3xl opacity-50"></div>
+        </div>
+        
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4 text-cream">

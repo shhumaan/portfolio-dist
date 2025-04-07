@@ -3,7 +3,9 @@
 import { motion } from "framer-motion"
 import type { Skill } from "@/types/skill"
 import { cn } from "@/lib/utils"
-import { useMemo } from "react"
+import { useMemo, useRef, useEffect } from "react"
+import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 interface SkillGalaxySimpleProps {
   skills: Skill[]
@@ -11,12 +13,12 @@ interface SkillGalaxySimpleProps {
   selectedSkill: Skill | null
 }
 
-const categoryColors = {
-  cloud: "bg-[#4ECDC4]/10 border-[#4ECDC4]/20 text-[#4ECDC4]",
-  development: "bg-[#34BE82]/10 border-[#34BE82]/20 text-[#34BE82]",
-  ai: "bg-[#8A2BE2]/10 border-[#8A2BE2]/20 text-[#8A2BE2]",
-  database: "bg-[#F4A261]/10 border-[#F4A261]/20 text-[#F4A261]",
-  system: "bg-[#f43f5e]/10 border-[#f43f5e]/20 text-[#f43f5e]",
+const categoryColors: Record<string, number> = {
+  cloud: 0x4ECDC4,
+  development: 0x34BE82,
+  ai: 0x8A2BE2,
+  database: 0xF4A261,
+  system: 0xf43f5e,
 }
 
 // Get proficiency color based on level
@@ -28,95 +30,100 @@ const getProficiencyColor = (proficiency: number | string): string => {
 };
 
 export function SkillGalaxySimple({ skills, onSelectSkill, selectedSkill }: SkillGalaxySimpleProps) {
-  // Generate stable animation delays for each skill
-  const animationDelays = useMemo(() => {
-    return skills.map((_, index) => {
-      // Use a deterministic value based on index instead of random
-      return (index % 5) * 0.1; // 0, 0.1, 0.2, 0.3, 0.4, repeat
+  const mountRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    const container = mountRef.current;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setClearColor(0x000000, 0); // Transparent background
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(50, 50, 50);
+    scene.add(pointLight);
+
+    // Skill Spheres
+    const spheres: THREE.Mesh[] = [];
+    const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+
+    skills.forEach((skill, index) => {
+      const color = categoryColors[skill.category] || 0xffffff;
+      const material = new THREE.MeshStandardMaterial({ color: color });
+      const sphere = new THREE.Mesh(geometry, material);
+      
+      // Position spheres in a simple spiral or random cloud
+      const angle = index * 137.5 * (Math.PI / 180);
+      const radius = Math.sqrt(index + 1) * 2;
+      sphere.position.set(Math.cos(angle) * radius, (index - skills.length / 2) * 0.5, Math.sin(angle) * radius);
+      
+      sphere.userData = { skill }; // Store skill data
+      spheres.push(sphere);
+      scene.add(sphere);
     });
-  }, [skills.length]); // Only regenerate if the number of skills changes
-  
+
+    camera.position.z = 15;
+
+    // Controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = true;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
+
+    // Animation Loop
+    let animationFrameId: number;
+    const animate = () => {
+      animationFrameId = requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Handle resizing
+    const handleResize = () => {
+      if (!mountRef.current) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      cancelAnimationFrame(animationFrameId);
+      renderer.dispose();
+      geometry.dispose();
+      // Dispose materials?
+    };
+  }, [skills]);
+
+  // Raycasting for selection (Example, needs refinement)
+  useEffect(() => {
+    if (!mountRef.current || !selectedSkill) return;
+    // Add logic here to highlight the selected skill sphere if needed
+    // This would involve finding the sphere with matching userData
+    // and potentially changing its material or adding an outline.
+  }, [selectedSkill]);
+
   return (
-    <div className="h-full overflow-auto p-4 flex items-center justify-center" style={{ backgroundColor: '#0A2E2A' }}>
-      <div className="grid grid-cols-2 gap-4 w-full max-w-xl">
-        {skills.map((skill, index) => {
-          const proficiency = typeof skill.proficiency === 'number' ? skill.proficiency : 50;
-          const proficiencyColor = getProficiencyColor(proficiency);
-          
-          return (
-            <motion.button
-              key={skill.id}
-              layoutId={`skill-${skill.id}`}
-              onClick={() => onSelectSkill(skill)}
-              className={cn(
-                "p-4 rounded-lg border flex flex-col items-center text-center",
-                "transition-all duration-300 hover:scale-105",
-                categoryColors[skill.category],
-                selectedSkill?.id === skill.id ? "ring-2 ring-premium-green ring-offset-2 ring-offset-black" : ""
-              )}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 30,
-                delay: animationDelays[index],
-              }}
-            >
-              {/* Circular skill indicator */}
-              <div className="relative w-14 h-14 mb-2">
-                <svg className="w-full h-full" viewBox="0 0 36 36">
-                  {/* Background circle */}
-                  <circle 
-                    cx="18" cy="18" r="16" 
-                    fill="none" 
-                    stroke="#333" 
-                    strokeWidth="1"
-                  />
-                  
-                  {/* Foreground circle - animated progress */}
-                  <motion.circle 
-                    cx="18" cy="18" r="16" 
-                    fill="none" 
-                    stroke={proficiencyColor}
-                    strokeWidth="2.5"
-                    strokeDasharray={`${proficiency} 100`}
-                    strokeDashoffset="25"
-                    strokeLinecap="round"
-                    initial={{ strokeDasharray: "0 100" }}
-                    animate={{ strokeDasharray: `${proficiency} 100` }}
-                    transition={{ duration: 1, delay: 0.2 }}
-                  />
-                  
-                  {/* Skill icon or text */}
-                  <text 
-                    x="18" y="20" 
-                    textAnchor="middle" 
-                    fontSize="12"
-                    fill="white"
-                  >
-                    {skill.icon || skill.name.charAt(0)}
-                  </text>
-                </svg>
-                {/* Proficiency percentage */}
-                <div className="absolute -bottom-1 -right-1 bg-black text-white text-xs px-1 rounded-sm">
-                  {proficiency}%
-                </div>
-              </div>
-              
-              <h3 className="text-sm font-medium mb-1">{skill.name}</h3>
-              
-              {/* Proficiency label */}
-              <div className="text-xs opacity-80 mt-1">
-                {proficiency >= 80 ? 'Working' : 
-                  proficiency >= 50 ? 'Active Development' : 
-                  'Exploration'}
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
+    <div className="w-full h-[500px] relative overflow-hidden">
+      <div 
+        ref={mountRef} 
+        className="absolute inset-0 bg-background flex items-center justify-center"
+      ></div>
     </div>
-  )
+  );
 }
 

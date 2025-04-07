@@ -21,17 +21,52 @@ export default function Hero() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 100])
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   
-  // State for typewriter effect
-  const [roleIndex, setRoleIndex] = useState(0)
-  // Use roles from the JSON data
-  const roles = heroData.role.titles
+  // Enhanced typewriter effect states
+  const [currentRole, setCurrentRole] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(120);
   
+  // Use roles from the JSON data
+  const roles = heroData.role.titles;
+  
+  // Role-specific styling classes - enhanced with more vibrant colors and glow effects
+  const roleStyles = [
+    "text-cyan-300 glow-cyan-sm font-bold", // Web Developer
+    "text-violet-300 glow-violet-sm font-bold", // Cloud Engineer
+    "text-amber-300 glow-amber-sm font-bold", // Support Specialist
+  ];
+  
+  // Typewriter effect logic
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRoleIndex((prevIndex) => (prevIndex + 1) % roles.length)
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [roles.length]) // Added roles.length as a dependency
+    const typewriterEffect = () => {
+      const currentFullRole = roles[roleIndex];
+      
+      if (isDeleting) {
+        // Deleting text - faster speed when deleting
+        setTypingSpeed(50);
+        setCurrentRole(current => current.substring(0, current.length - 1));
+        if (currentRole === '') {
+          setIsDeleting(false);
+          setRoleIndex((prev) => (prev + 1) % roles.length);
+          setTypingSpeed(120);
+        }
+      } else {
+        // Typing text
+        setCurrentRole(current => 
+          currentFullRole.substring(0, current.length + 1)
+        );
+        if (currentRole === currentFullRole) {
+          // Pause at the end of typing before starting to delete
+          setTypingSpeed(2500);
+          setIsDeleting(true);
+        }
+      }
+    };
+
+    const timer = setTimeout(typewriterEffect, typingSpeed);
+    return () => clearTimeout(timer);
+  }, [currentRole, isDeleting, roleIndex, roles, typingSpeed]);
 
   // Staggered animation variants
   const containerVariants = {
@@ -74,11 +109,26 @@ export default function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       ref={containerRef}
     >
-      {/* Local gradient overlay for better hero text readability */}
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-background/10 to-background/50 opacity-80" />
-      
-      {/* Content */}
-      <div className="container mx-auto px-4 py-24 relative z-10">
+      {/* Add a container div for the elevation styles */}
+      <div className="container mx-auto px-4 py-24 relative z-10 bg-card/80 backdrop-blur-sm rounded-lg shadow-premium-lg my-8 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_40px_8px_rgba(255,255,255,0.3)]">
+        {/* Local gradient overlay for better hero text readability */}
+        {/* This gradient is now less necessary with the card background, but keep for style */}
+        <div className="absolute inset-0 bg-gradient-radial from-transparent via-background/5 to-background/20 opacity-60 rounded-lg pointer-events-none" />
+        
+        {/* Add glow effect classes to globals.css */}
+        <style jsx global>{`
+          .glow-cyan-sm {
+            text-shadow: 0 0 15px rgba(103, 232, 249, 0.5), 0 0 8px rgba(103, 232, 249, 0.3);
+          }
+          .glow-violet-sm {
+            text-shadow: 0 0 15px rgba(196, 181, 253, 0.5), 0 0 8px rgba(196, 181, 253, 0.3);
+          }
+          .glow-amber-sm {
+            text-shadow: 0 0 15px rgba(252, 211, 77, 0.5), 0 0 8px rgba(252, 211, 77, 0.3);
+          }
+        `}</style>
+        
+        {/* Content */}
         <motion.div 
           className="max-w-3xl mx-auto"
           initial="hidden"
@@ -87,7 +137,7 @@ export default function Hero() {
           style={{ y, opacity }}
         >
           <motion.div variants={itemVariants} className="mb-2 flex justify-center sm:justify-start">
-            <span className="px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium">
+            <span className="px-4 py-1 rounded-full bg-theme/10 border border-theme/20 text-theme text-sm font-medium">
               {heroData.welcomeBadge}
             </span>
           </motion.div>
@@ -96,7 +146,7 @@ export default function Hero() {
             variants={itemVariants} 
             className="text-4xl md:text-6xl xl:text-7xl font-bold font-heading mb-4 text-center sm:text-left"
           >
-            {heroData.greeting.prefix} <span className="text-emerald">{heroData.greeting.name}</span>
+            {heroData.greeting.prefix} <span className="text-theme">{heroData.greeting.name}</span>
           </motion.h1>
           
           <motion.div
@@ -105,24 +155,11 @@ export default function Hero() {
           >
             <div className="h-12 flex items-center justify-center sm:justify-start">
               <span className="mr-2">{heroData.role.prefix}</span>
-              <div className="relative h-10 overflow-hidden">
-                <div 
-                  className="absolute transition-transform duration-500 ease-in-out flex flex-col"
-                  style={{ transform: `translateY(-${roleIndex * 100}%)` }}
-                >
-                  {roles.map((role, index) => (
-                    <span 
-                      key={index} 
-                      className={`h-10 flex items-center text-transparent bg-clip-text bg-gradient-to-r
-                        ${index === 0 ? 'from-cloud to-emerald' : 
-                         index === 1 ? 'from-dev to-cloud' : 
-                         'from-ai to-support'}`
-                      }
-                    >
-                      {role}
-                    </span>
-                  ))}
-                </div>
+              <div className="h-10 flex items-center relative rounded-lg px-2 py-1 bg-elevation-2/50 backdrop-blur-sm border border-elevation-1">
+                <span className={roleStyles[roleIndex]}>
+                  {currentRole}
+                </span>
+                <span className={`animate-pulse ml-0.5 h-6 w-1 ${roleIndex === 0 ? 'bg-cyan-300' : roleIndex === 1 ? 'bg-violet-300' : 'bg-amber-300'}`}></span>
               </div>
             </div>
           </motion.div>
@@ -131,7 +168,7 @@ export default function Hero() {
             variants={itemVariants}
             className="text-xl font-accent text-soft-cream mb-8 text-center sm:text-left"
           >
-            <span className="text-emerald">{heroData.tagline.prefix}</span> {heroData.tagline.content} <span className="text-emerald">{heroData.tagline.suffix}</span>
+            <span className="text-theme">{heroData.tagline.prefix}</span> {heroData.tagline.content} <span className="text-theme">{heroData.tagline.suffix}</span>
           </motion.div>
 
           <motion.div
@@ -151,7 +188,7 @@ export default function Hero() {
               <Button 
                 size="lg" 
                 onClick={() => scrollToSection("projects")} 
-                className="bg-emerald hover:bg-emerald/90 text-deep-teal font-medium rounded-full"
+                className="bg-theme hover:bg-theme/90 text-deep-teal font-medium rounded-full"
               >
                 {heroData.buttons.projects} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -162,7 +199,7 @@ export default function Hero() {
                 size="lg" 
                 variant="outline" 
                 onClick={() => scrollToSection("contact")}
-                className="border-emerald/30 text-cream hover:text-emerald hover:bg-emerald/10 font-medium rounded-full"
+                className="border-theme/30 text-cream hover:text-theme hover:bg-theme/10 font-medium rounded-full"
               >
                 {heroData.buttons.contact}
               </Button>
@@ -184,7 +221,7 @@ export default function Hero() {
           repeatDelay: 0.2,
         }}
       >
-        <ArrowDown className="h-8 w-8 text-emerald" />
+        <ArrowDown className="h-8 w-8 text-theme" />
       </motion.div>
     </section>
   )

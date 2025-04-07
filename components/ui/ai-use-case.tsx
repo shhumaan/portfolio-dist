@@ -1,4 +1,6 @@
-import type React from "react"
+"use client"
+
+import React from "react"
 import { motion } from "framer-motion"
 
 interface AIUseCaseProps {
@@ -10,18 +12,20 @@ interface AIUseCaseProps {
 export function AIUseCase({ icon, title, description }: AIUseCaseProps) {
   return (
     <motion.div 
-      className="bg-elevation-2 rounded-lg p-8 border border-elevation-1 shadow-lg hover:shadow-emerald/10 transition-all duration-300"
-      whileHover={{ 
-        y: -5,
-        boxShadow: "0 15px 30px rgba(6, 214, 160, 0.07)",
-        borderColor: "rgba(6, 214, 160, 0.3)" 
-      }}
+      className="bg-elevation-2 rounded-lg p-6 border border-theme/20 shadow-lg relative overflow-hidden"
+      whileHover={{ scale: 1.03, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald/10 border border-emerald/20 text-emerald mb-6 mx-auto">
-        {icon}
+      <div className="absolute right-0 bottom-0 w-32 h-32 rounded-full bg-theme/5 blur-2xl -mb-16 -mr-16"></div>
+      
+      <div className="flex flex-col items-center text-center relative z-10">
+        <div className="w-16 h-16 rounded-full bg-theme/10 flex items-center justify-center mb-4">
+          {icon}
+        </div>
+        
+        <h3 className="text-lg font-bold mb-2 text-cream">{title}</h3>
+        <p className="text-soft-cream/70 text-sm">{description}</p>
       </div>
-      <h4 className="text-xl font-bold text-center mb-4 text-cream">{title}</h4>
-      <p className="text-soft-cream/80 text-center leading-relaxed">{description}</p>
     </motion.div>
   )
 }

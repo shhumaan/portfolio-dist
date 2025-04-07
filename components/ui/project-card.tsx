@@ -46,7 +46,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
         <div
           className={cn(
             "absolute inset-0 backface-hidden rounded-xl overflow-hidden shadow-premium-sm",
-            "bg-elevation-1 border border-premium-green/20"
+            "bg-elevation-1 border border-theme/20"
           )}
         >
           <div className="h-2 w-full" style={{ backgroundColor: categoryColors[project.category] }}></div>
@@ -72,7 +72,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {project.technologies.slice(0, 4).map((tech) => (
-                  <span key={tech} className="text-xs px-2 py-0.5 bg-premium-green/10 text-soft-cream/80 rounded-full">
+                  <span key={tech} className="text-xs px-2 py-0.5 bg-theme/10 text-soft-cream/80 rounded-full">
                     {tech}
                   </span>
                 ))}
@@ -86,7 +86,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
 
             <div className="flex items-center justify-between pt-4 border-t border-soft-cream/10">
               <span className="text-sm text-soft-cream/60">{project.date}</span>
-              <button className="text-sm flex items-center text-premium-green hover:text-premium-green/80 transition-colors">
+              <button className="text-sm flex items-center text-theme hover:text-theme/80 transition-colors">
                 Details <ChevronRight className="h-4 w-4 ml-1" />
               </button>
             </div>
@@ -94,7 +94,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
         </div>
 
         {/* Back of card */}
-        <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden shadow-premium-sm bg-elevation-1 border border-premium-green/20 rotate-y-180">
+        <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden shadow-premium-sm bg-elevation-1 border border-theme/20 rotate-y-180">
           <div className="h-2 w-full" style={{ backgroundColor: categoryColors[project.category] }}></div>
           <div className="p-6 flex flex-col h-full">
             <h3 className="text-xl font-bold mb-3 text-cream">{project.title}</h3>
@@ -108,7 +108,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
               <ul className="space-y-1.5">
                 {project.achievements.slice(0, featured ? 4 : 3).map((achievement, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm text-soft-cream/80">
-                    <span className="text-premium-green mt-1">•</span>
+                    <span className="text-theme mt-1">•</span>
                     <span>{achievement}</span>
                   </li>
                 ))}
@@ -137,7 +137,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={handleLinkClick}
-                  className="px-3 py-1.5 bg-premium-green text-black rounded-lg text-sm hover:bg-premium-green/90 transition-colors flex items-center gap-2"
+                  className="px-3 py-1.5 bg-theme text-black rounded-lg text-sm hover:bg-theme/90 transition-colors flex items-center gap-2"
                 >
                   <ExternalLink className="h-4 w-4" /> Live Demo
                 </a>

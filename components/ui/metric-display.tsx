@@ -1,76 +1,76 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
-import { useIntersectionObserver } from "@/hooks/use-intersection-observer"
+import React, { useRef, useEffect } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 interface MetricDisplayProps {
-  value: number
-  label: string
-  prefix?: string
-  suffix?: string
-  icon?: React.ReactNode
+  value: number;
+  label: string;
+  suffix?: string;
+  icon?: React.ReactNode;
 }
 
-export function MetricDisplay({ value, label, prefix = "", suffix = "", icon }: MetricDisplayProps) {
-  const [count, setCount] = useState(0)
-  const countStarted = useRef(false)
-  const { ref, isInView } = useIntersectionObserver({ threshold: 0.5 })
+export function MetricDisplay({ value, label, suffix, icon }: MetricDisplayProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const [displayValue, setDisplayValue] = React.useState(0);
 
   useEffect(() => {
-    if (!isInView || countStarted.current) return
+    if (isInView) {
+      let start = 0;
+      const end = value;
+      const duration = 1500;
+      const frameDuration = 1000 / 60;
+      const totalFrames = Math.round(duration / frameDuration);
+      const increment = (end - start) / totalFrames;
 
-    countStarted.current = true
-    let startTime: number
-    let animationFrame: number
+      const counter = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          setDisplayValue(end);
+          clearInterval(counter);
+        } else {
+          setDisplayValue(Math.floor(start));
+        }
+      }, frameDuration);
 
-    const countUp = (timestamp: number) => {
-      if (!startTime) startTime = timestamp
-      const progress = timestamp - startTime
-
-      // Calculate the current count based on progress
-      const percentage = Math.min(progress / 2000, 1)
-      // Use easeOutQuad for smoother animation
-      const easeOutQuad = 1 - (1 - percentage) * (1 - percentage)
-      const currentCount = Math.floor(easeOutQuad * value)
-
-      setCount(currentCount)
-
-      if (progress < 2000) {
-        animationFrame = requestAnimationFrame(countUp)
-      }
+      return () => clearInterval(counter);
     }
-
-    animationFrame = requestAnimationFrame(countUp)
-
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame)
-      }
-    }
-  }, [isInView, value])
+  }, [isInView, value]);
 
   return (
-    <div 
-      ref={ref as React.RefObject<HTMLDivElement>}
-      className="bg-elevation-2 rounded-lg p-8 border border-elevation-1 shadow-lg relative overflow-hidden group"
-    >
-      {/* Background gradient effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald/5 to-elevation-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald/10 border border-emerald/20 text-emerald mb-6 mx-auto relative">
-        {icon}
+    <div ref={ref} className="flex flex-col items-center text-center">
+      <div className="flex items-start">
+        {icon && (
+          <div className="mr-2 text-theme">
+            {icon}
+          </div>
+        )}
+        <div>
+          <motion.div 
+            className="flex items-baseline"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <span className="text-3xl md:text-4xl font-bold text-theme">
+              {displayValue}
+            </span>
+            {suffix && (
+              <span className="text-xl text-theme ml-1">{suffix}</span>
+            )}
+          </motion.div>
+          <motion.p
+            className="text-sm text-soft-cream/80 mt-1"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {label}
+          </motion.p>
+        </div>
       </div>
-      
-      <div className="text-4xl md:text-5xl font-bold text-emerald mb-4 text-center relative">
-        {prefix}
-        <span className="inline-block min-w-[2ch] tabular-nums">{count}</span>
-        {suffix}
-      </div>
-      
-      <div className="text-base text-soft-cream/70 text-center relative">{label}</div>
     </div>
-  )
+  );
 }
 

@@ -41,17 +41,23 @@ export default function AIShowcase() {
   }
 
   return (
-    <section id="ai-showcase" ref={sectionRef} className="py-24 bg-elevation-5 relative overflow-hidden">
-      {/* Background pattern using image */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid-pattern.png')] bg-repeat"></div>
-      </div>
-      
-      {/* Content container */}
-      <div className="container mx-auto px-4 relative z-10">
+    <section id="ai-showcase" ref={sectionRef} className="py-24 relative overflow-hidden">
+      {/* Apply elevation styles to the main container within the section */}
+      <div className="container mx-auto px-4 relative z-10 bg-card/80 backdrop-blur-sm rounded-lg shadow-premium-lg py-12 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_40px_8px_rgba(255,255,255,0.3)]">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
+          <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-theme/5 blur-3xl opacity-50"></div>
+          <div className="absolute -bottom-24 -left-24 w-64 h-64 rounded-full bg-theme/3 blur-3xl opacity-50"></div>
+        </div>
+        
+        {/* Background pattern using image */}
+        <div className="absolute inset-0 opacity-10 rounded-lg overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid-pattern.png')] bg-repeat"></div>
+        </div>
+        
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-16">
-            <span className="inline-block px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 rounded-full bg-theme/10 border border-theme/20 text-theme text-sm font-medium mb-4">
               {aiShowcaseData.section.badge}
             </span>
             <h2 className="text-4xl md:text-5xl font-bold font-heading mb-5 text-cream">{aiShowcaseData.section.title}</h2>
@@ -69,7 +75,7 @@ export default function AIShowcase() {
               <span className="relative inline-block">
                 {aiShowcaseData.useCases.title}
                 <motion.span
-                  className="absolute -top-6 right-0 text-emerald"
+                  className="absolute -top-6 right-0 text-theme"
                   initial={{ opacity: 0, y: 10, rotate: -5 }}
                   animate={{ opacity: 1, y: 0, rotate: 0 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
@@ -95,7 +101,7 @@ export default function AIShowcase() {
               <span className="relative inline-block">
                 {aiShowcaseData.impact.title}
                 <motion.span
-                  className="absolute -top-6 -right-6 text-emerald"
+                  className="absolute -top-6 -right-6 text-theme"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7, duration: 0.5 }}

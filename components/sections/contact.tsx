@@ -72,7 +72,6 @@ export default function Contact() {
     try {
       // In a real implementation, you would send this data to your API
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log(data)
       setFormSubmitted(true)
       
       // Simulate AI typing response
@@ -132,16 +131,17 @@ export default function Contact() {
 
   return (
     <section id="contact" ref={sectionRef} className="py-20 relative">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -left-20 w-40 h-40 rounded-full bg-emerald/5 blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-emerald/5 blur-3xl"></div>
-      </div>
-      
-      <div className="container mx-auto px-4 relative">
+      {/* Apply elevation styles to the main container within the section */}
+      <div className="container mx-auto px-4 relative z-10 bg-card/80 backdrop-blur-sm rounded-lg shadow-premium-lg py-12 transition-shadow duration-300 ease-in-out hover:shadow-[0_0_40px_8px_rgba(255,255,255,0.3)]">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-lg">
+          <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-theme/5 blur-3xl opacity-50"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 rounded-full bg-theme/3 blur-3xl opacity-50"></div>
+        </div>
+        
         <motion.div variants={containerVariants} initial="hidden" animate={isInView ? "visible" : "hidden"}>
           <motion.div variants={itemVariants} className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium mb-4">
+            <div className="inline-block px-4 py-1 rounded-full bg-theme/10 border border-theme/20 text-theme text-sm font-medium mb-4">
               {contactData.section.badge}
             </div>
             <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">{contactData.section.title}</h2>
@@ -176,7 +176,7 @@ export default function Contact() {
                                     <Input 
                                       placeholder={contactData.form.fields.name.placeholder} 
                                       {...field} 
-                                      className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30" 
+                                      className="focus:border-theme/70 focus:ring-2 focus:ring-theme/30 transition-all duration-200 hover:border-theme/40 focus:scale-[1.01]"
                                     />
                                   </motion.div>
                                 </FormControl>
@@ -196,7 +196,7 @@ export default function Contact() {
                                     <Input 
                                       placeholder={contactData.form.fields.email.placeholder} 
                                       {...field} 
-                                      className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30"
+                                      className="focus:border-theme/70 focus:ring-2 focus:ring-theme/30 transition-all duration-200 hover:border-theme/40 focus:scale-[1.01]"
                                     />
                                   </motion.div>
                                 </FormControl>
@@ -217,7 +217,7 @@ export default function Contact() {
                                   <Input 
                                     placeholder={contactData.form.fields.subject.placeholder} 
                                     {...field} 
-                                    className="bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30"
+                                    className="focus:border-theme/70 focus:ring-2 focus:ring-theme/30 transition-all duration-200 hover:border-theme/40 focus:scale-[1.01]"
                                   />
                                 </motion.div>
                               </FormControl>
@@ -234,14 +234,18 @@ export default function Contact() {
                               <FormLabel className="text-cream/90">{contactData.form.fields.message.label}</FormLabel>
                               <FormControl>
                                 <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                                  <Textarea 
-                                    placeholder={contactData.form.fields.message.placeholder} 
-                                    className="min-h-40 bg-elevation-3 border-elevation-1 focus:border-emerald/50 focus:ring-emerald/20 transition-all duration-300 hover:border-emerald/30" 
-                                    {...field} 
+                                  <Textarea
+                                    placeholder={contactData.form.fields.message.placeholder}
+                                    rows={5}
+                                    {...field}
+                                    className="focus:border-theme/70 focus:ring-2 focus:ring-theme/30 transition-all duration-200 hover:border-theme/40 focus:scale-[1.01] resize-none"
                                   />
                                 </motion.div>
                               </FormControl>
                               <FormMessage className="text-[#ff6b6b]" />
+                              <div className="text-xs text-right text-muted-foreground/70">
+                                {messageValue.length} / 1000
+                              </div>
                             </FormItem>
                           )}
                         />
@@ -254,11 +258,11 @@ export default function Contact() {
                             className="p-4 rounded-lg bg-elevation-3/80 border border-elevation-1"
                           >
                             <div className="flex items-center mb-2">
-                              <MessageSquare className="h-4 w-4 text-emerald mr-2" />
+                              <MessageSquare className="h-4 w-4 text-theme mr-2" />
                               <h4 className="text-sm font-medium text-cream/90">{contactData.form.preview.title}</h4>
                             </div>
                             <div className="flex">
-                              <div className="w-8 h-8 rounded-full bg-emerald/20 flex-shrink-0 flex items-center justify-center mr-3 text-xs font-medium text-emerald">
+                              <div className="w-8 h-8 rounded-full bg-theme/20 flex-shrink-0 flex items-center justify-center mr-3 text-xs font-medium text-theme">
                                 {nameValue ? nameValue.charAt(0).toUpperCase() : "A"}
                               </div>
                               <div className="bg-elevation-4 rounded-lg p-3 text-sm text-cream/80">
@@ -274,7 +278,7 @@ export default function Contact() {
                         >
                           <Button 
                             type="submit" 
-                            className="w-full bg-emerald hover:bg-emerald/90 text-deep-teal font-medium py-3 shadow-[0_2px_10px_rgba(6,214,160,0.3)] transition-all duration-300" 
+                            className="w-full bg-theme hover:bg-theme/90 text-deep-teal font-medium py-3 shadow-[0_2px_10px_rgba(6,214,160,0.3)] transition-all duration-300" 
                             disabled={isSubmitting}
                           >
                             {isSubmitting ? (
@@ -301,22 +305,22 @@ export default function Contact() {
                     key="success"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-emerald/10 rounded-lg border border-emerald/20 p-8 text-center"
+                    className="bg-theme/10 rounded-lg border border-theme/20 p-8 text-center"
                   >
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                      className="w-16 h-16 rounded-full bg-emerald/20 flex items-center justify-center mx-auto mb-6"
+                      className="w-16 h-16 rounded-full bg-theme/20 flex items-center justify-center mx-auto mb-6"
                     >
-                      <CheckCircle className="h-8 w-8 text-emerald" />
+                      <CheckCircle className="h-8 w-8 text-theme" />
                     </motion.div>
                     <h4 className="text-xl font-bold text-cream mb-2">{contactData.successMessage.title}</h4>
                     
                     {/* AI Response */}
                     <div className="mt-6 p-4 rounded-lg bg-elevation-3 mb-4 text-left">
                       <div className="flex items-start">
-                        <div className="w-8 h-8 rounded-full bg-emerald/10 flex-shrink-0 flex items-center justify-center text-emerald mr-3">
+                        <div className="w-8 h-8 rounded-full bg-theme/10 flex-shrink-0 flex items-center justify-center text-theme mr-3">
                           A
                         </div>
                         <div>
@@ -324,9 +328,9 @@ export default function Contact() {
                           <div className="bg-elevation-4 rounded-lg p-3">
                             {aiTyping ? (
                               <div className="flex items-center space-x-1">
-                                <div className="w-2 h-2 rounded-full bg-emerald/60 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                                <div className="w-2 h-2 rounded-full bg-emerald/60 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                                <div className="w-2 h-2 rounded-full bg-emerald/60 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                                <div className="w-2 h-2 rounded-full bg-theme/60 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                                <div className="w-2 h-2 rounded-full bg-theme/60 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                                <div className="w-2 h-2 rounded-full bg-theme/60 animate-bounce" style={{ animationDelay: "300ms" }}></div>
                               </div>
                             ) : (
                               <p className="text-cream/80">{aiResponse}</p>
@@ -346,14 +350,14 @@ export default function Contact() {
 
                 <div className="space-y-8">
                   <motion.div className="flex items-start group" whileHover={hoverScale}>
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald/10 flex items-center justify-center mr-4 group-hover:bg-emerald/20 transition-colors">
-                      <Mail className="h-5 w-5 text-emerald" />
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-theme/10 flex items-center justify-center mr-4 group-hover:bg-theme/20 transition-colors">
+                      <Mail className="h-5 w-5 text-theme" />
                     </div>
                     <div>
                       <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.email.label}</h4>
                       <a
                         href={`mailto:${contactData.contactInfo.email.value}`}
-                        className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
+                        className="text-soft-cream/80 hover:text-theme transition-colors flex items-center group-hover:underline"
                       >
                         {contactData.contactInfo.email.value}
                       </a>
@@ -361,8 +365,8 @@ export default function Contact() {
                   </motion.div>
 
                   <motion.div className="flex items-start group" whileHover={hoverScale}>
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald/10 flex items-center justify-center mr-4 group-hover:bg-emerald/20 transition-colors">
-                      <Linkedin className="h-5 w-5 text-emerald" />
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-theme/10 flex items-center justify-center mr-4 group-hover:bg-theme/20 transition-colors">
+                      <Linkedin className="h-5 w-5 text-theme" />
                     </div>
                     <div>
                       <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.linkedin.label}</h4>
@@ -370,7 +374,7 @@ export default function Contact() {
                         href={contactData.contactInfo.linkedin.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
+                        className="text-soft-cream/80 hover:text-theme transition-colors flex items-center group-hover:underline"
                       >
                         <span>{contactData.contactInfo.linkedin.value}</span>
                         <ExternalLink className="h-3 w-3 ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -379,8 +383,8 @@ export default function Contact() {
                   </motion.div>
 
                   <motion.div className="flex items-start group" whileHover={hoverScale}>
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-emerald/10 flex items-center justify-center mr-4 group-hover:bg-emerald/20 transition-colors">
-                      <Github className="h-5 w-5 text-emerald" />
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-theme/10 flex items-center justify-center mr-4 group-hover:bg-theme/20 transition-colors">
+                      <Github className="h-5 w-5 text-theme" />
                     </div>
                     <div>
                       <h4 className="font-medium mb-1 text-cream">{contactData.contactInfo.github.label}</h4>
@@ -388,7 +392,7 @@ export default function Contact() {
                         href={contactData.contactInfo.github.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-soft-cream/80 hover:text-emerald transition-colors flex items-center group-hover:underline"
+                        className="text-soft-cream/80 hover:text-theme transition-colors flex items-center group-hover:underline"
                       >
                         <span>{contactData.contactInfo.github.value}</span>
                         <ExternalLink className="h-3 w-3 ml-1 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -403,7 +407,7 @@ export default function Contact() {
                   <h3 className="text-xl font-bold text-cream">{contactData.availability.title}</h3>
                   
                   {/* Current time display */}
-                  <div className="flex items-center text-sm text-emerald">
+                  <div className="flex items-center text-sm text-theme">
                     <Clock className="h-4 w-4 mr-1" />
                     <span>{currentTime}</span>
                   </div>
@@ -412,17 +416,17 @@ export default function Contact() {
                   {contactData.availability.description}
                 </p>
                 <div className="flex flex-col gap-2 mt-4">
-                  <div className="inline-block px-3 py-1 rounded-full bg-emerald/10 border border-emerald/20 text-emerald text-sm font-medium w-fit">
+                  <div className="inline-block px-3 py-1 rounded-full bg-theme/10 border border-theme/20 text-theme text-sm font-medium w-fit">
                     {contactData.availability.status}
                   </div>
                   <div className="text-xs text-soft-cream/60 flex items-center mt-2">
-                    <Clock className="h-3 w-3 mr-1 text-emerald/70" />
+                    <Clock className="h-3 w-3 mr-1 text-theme/70" />
                     <span>{contactData.availability.responseTimePrefix} {responseTime}</span>
                   </div>
                 </div>
                 
                 {/* Decorative gradient */}
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-emerald/5 blur-2xl"></div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-theme/5 blur-2xl"></div>
               </div>
             </motion.div>
           </div>

@@ -99,43 +99,43 @@ export function WorkflowComparison() {
           style={{ clipPath: `inset(0 0 0 ${sliderPosition}%)` }}
         >
           <div className="max-w-[480px] mx-auto">
-            <h4 className="text-lg font-bold mb-6 text-emerald">AI-Enhanced Workflow</h4>
+            <h4 className="text-lg font-bold mb-6 text-theme">AI-Enhanced Workflow</h4>
             
             <div className="space-y-6">
               <div className="flex items-start">
-                <div className="w-8 h-8 rounded-full bg-emerald/30 flex-shrink-0 flex items-center justify-center text-emerald font-bold mt-0.5">1</div>
+                <div className="w-8 h-8 rounded-full bg-theme/30 flex-shrink-0 flex items-center justify-center text-theme font-bold mt-0.5">1</div>
                 <div className="ml-3">
                   <p className="font-medium text-cream/95">AI ticket categorization</p>
-                  <p className="text-sm text-emerald/95">1-2 minutes</p>
+                  <p className="text-sm text-theme/95">1-2 minutes</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="w-8 h-8 rounded-full bg-emerald/30 flex-shrink-0 flex items-center justify-center text-emerald font-bold mt-0.5">2</div>
+                <div className="w-8 h-8 rounded-full bg-theme/30 flex-shrink-0 flex items-center justify-center text-theme font-bold mt-0.5">2</div>
                 <div className="ml-3">
                   <p className="font-medium text-cream/95">AI knowledge retrieval</p>
-                  <p className="text-sm text-emerald/95">2-3 minutes</p>
+                  <p className="text-sm text-theme/95">2-3 minutes</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="w-8 h-8 rounded-full bg-emerald/30 flex-shrink-0 flex items-center justify-center text-emerald font-bold mt-0.5">3</div>
+                <div className="w-8 h-8 rounded-full bg-theme/30 flex-shrink-0 flex items-center justify-center text-theme font-bold mt-0.5">3</div>
                 <div className="ml-3">
                   <p className="font-medium text-cream/95">AI response generation</p>
-                  <p className="text-sm text-emerald/95">3-5 minutes</p>
+                  <p className="text-sm text-theme/95">3-5 minutes</p>
                 </div>
               </div>
               
               <div className="flex items-start">
-                <div className="w-8 h-8 rounded-full bg-emerald/30 flex-shrink-0 flex items-center justify-center text-emerald font-bold mt-0.5">4</div>
+                <div className="w-8 h-8 rounded-full bg-theme/30 flex-shrink-0 flex items-center justify-center text-theme font-bold mt-0.5">4</div>
                 <div className="ml-3">
                   <p className="font-medium text-cream/95">Human review and send</p>
-                  <p className="text-sm text-emerald/95">5 minutes</p>
+                  <p className="text-sm text-theme/95">5 minutes</p>
                 </div>
               </div>
               
-              <div className="mt-6 p-3 bg-emerald/25 rounded-lg border border-emerald/40">
-                <p className="font-medium text-emerald/95 text-center">Total time: 11-15 minutes</p>
+              <div className="mt-6 p-3 bg-theme/25 rounded-lg border border-theme/40">
+                <p className="font-medium text-theme/95 text-center">Total time: 11-15 minutes</p>
               </div>
             </div>
           </div>
@@ -143,11 +143,11 @@ export function WorkflowComparison() {
 
         {/* Slider divider control */}
         <div 
-          className="absolute inset-y-0 w-[3px] bg-emerald shadow-[0_0_12px_rgba(6,214,160,0.9)] z-20" 
+          className="absolute inset-y-0 w-[3px] bg-theme shadow-[0_0_12px_rgba(6,214,160,0.9)] z-20" 
           style={{ left: `${sliderPosition}%` }}
         >
           <div 
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-emerald border-[3px] border-deep-teal shadow-[0_0_15px_rgba(6,214,160,0.9)] flex items-center justify-center cursor-ew-resize"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-theme border-[3px] border-deep-teal shadow-[0_0_15px_rgba(6,214,160,0.9)] flex items-center justify-center cursor-ew-resize"
             onMouseDown={() => {
               const handleMouseMove = (e: MouseEvent) => {
                 const container = document.querySelector('.relative.h-\\[400px\\]')?.getBoundingClientRect()

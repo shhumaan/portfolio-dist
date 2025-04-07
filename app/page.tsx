@@ -1,11 +1,17 @@
 import { Suspense } from "react"
+import dynamic from 'next/dynamic'
 import Hero from "@/components/sections/hero"
-import About from "@/components/sections/about"
-import Skills from "@/components/sections/skills"
-import Projects from "@/components/sections/projects"
-import AIShowcase from "@/components/sections/ai-showcase"
-import Contact from "@/components/sections/contact"
 import { SectionLoader } from "@/components/ui/section-loader"
+
+// Define a simple loading component function for dynamic imports
+const Loading = () => <SectionLoader />;
+
+// Dynamically import sections below the fold with explicit loading component
+const About = dynamic(() => import("@/components/sections/about"), { loading: Loading })
+const Skills = dynamic(() => import("@/components/sections/skills"), { loading: Loading })
+const Projects = dynamic(() => import("@/components/sections/projects"), { loading: Loading })
+const AIShowcase = dynamic(() => import("@/components/sections/ai-showcase"), { loading: Loading })
+const Contact = dynamic(() => import("@/components/sections/contact"), { loading: Loading })
 
 export const metadata = {
   title: "Anshuman | Cloud Engineer & Web Developer",
