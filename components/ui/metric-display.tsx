@@ -40,15 +40,15 @@ export function MetricDisplay({ value, label, suffix, icon }: MetricDisplayProps
 
   return (
     <div ref={ref} className="flex flex-col items-center text-center">
-      <div className="flex items-start">
+      <div className="flex items-baseline justify-center">
         {icon && (
           <div className="mr-2 text-theme">
             {icon}
           </div>
         )}
-        <div>
+        <div className="flex flex-col items-center text-center">
           <motion.div 
-            className="flex items-baseline"
+            className="flex items-baseline justify-center"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}

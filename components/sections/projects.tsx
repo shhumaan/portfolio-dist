@@ -9,6 +9,13 @@ import type { ProjectCategory } from "@/types/project"
 
 const categories: ProjectCategory[] = ["all", "ai", "cloud", "development", "support"]
 
+const categoryColors = {
+  ai: { color: "#8A2BE2", bg: "bg-[#8A2BE2]", textColor: "text-[#8A2BE2]", border: "border-[#8A2BE2]" },
+  cloud: { color: "#4ECDC4", bg: "bg-[#4ECDC4]", textColor: "text-[#4ECDC4]", border: "border-[#4ECDC4]" },
+  development: { color: "#34BE82", bg: "bg-[#34BE82]", textColor: "text-[#34BE82]", border: "border-[#34BE82]" },
+  support: { color: "#FB8B24", bg: "bg-[#FB8B24]", textColor: "text-[#FB8B24]", border: "border-[#FB8B24]" }
+};
+
 export default function Projects() {
   const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("all")
   const [viewMode, setViewMode] = useState<"grid" | "featured">("featured")
@@ -68,7 +75,7 @@ export default function Projects() {
                   onClick={() => setViewMode("featured")}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                     viewMode === "featured"
-                      ? "bg-premium-green text-black shadow-premium-sm"
+                      ? "bg-theme text-black shadow-premium-sm"
                       : "text-soft-cream/80 hover:text-soft-cream"
                   }`}
                 >
@@ -78,7 +85,7 @@ export default function Projects() {
                   onClick={() => setViewMode("grid")}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                     viewMode === "grid" 
-                      ? "bg-premium-green text-black shadow-premium-sm"
+                      ? "bg-theme text-black shadow-premium-sm"
                       : "text-soft-cream/80 hover:text-soft-cream"
                   }`}
                 >
@@ -122,7 +129,9 @@ export default function Projects() {
                           <ul className="space-y-2">
                             {project.achievements.map((achievement, idx) => (
                               <li key={idx} className="flex items-start gap-2 text-soft-cream/80">
-                                <span className="text-premium-green mt-1">•</span>
+                                <span 
+                                  className={`${categoryColors[project.category]?.textColor || 'text-theme'} mt-1`}
+                                >•</span>
                                 <span>{achievement}</span>
                               </li>
                             ))}
@@ -134,8 +143,9 @@ export default function Projects() {
                             {project.technologies.map((tech) => (
                               <span 
                                 key={tech} 
-                                className="px-3 py-1 bg-premium-green/10 border border-premium-green/30 
-                                           rounded-full text-xs text-soft-cream"
+                                className={`px-3 py-1 ${categoryColors[project.category]?.bg || 'bg-theme'}/10 
+                                            border ${categoryColors[project.category]?.border || 'border-theme'}/30 
+                                            rounded-full text-xs text-soft-cream`}
                               >
                                 {tech}
                               </span>

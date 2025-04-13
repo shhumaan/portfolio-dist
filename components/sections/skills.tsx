@@ -64,29 +64,33 @@ export default function Skills() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-center items-center gap-4 mb-8">
-            <div className="flex bg-elevation-1 rounded-full p-1 mb-4 md:mb-0 shadow-premium-sm">
-              <button
-                onClick={() => setVisualizationType("network")}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  visualizationType === "network"
-                    ? "bg-premium-green text-black shadow-premium-sm"
-                    : "text-soft-cream/80 hover:text-soft-cream"
-                }`}
-              >
-                {skillsData.visualizationTypes.network.buttonLabel}
-              </button>
-              <button
-                onClick={() => setVisualizationType("category")}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  visualizationType === "category" 
-                    ? "bg-premium-green text-black shadow-premium-sm"
-                    : "text-soft-cream/80 hover:text-soft-cream"
-                }`}
-              >
-                {skillsData.visualizationTypes.category.buttonLabel}
-              </button>
-            </div>
-            
+            {/* Hide visualization type switcher on mobile */}
+            {!isMobile && (
+              <div className="flex bg-elevation-1 rounded-full p-1 mb-4 md:mb-0 shadow-premium-sm">
+                <button
+                  onClick={() => setVisualizationType("network")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-sm ${
+                    visualizationType === "network"
+                      ? "bg-theme text-card shadow-md ring-2 ring-theme"
+                      : "bg-elevation-1 text-soft-cream/80 hover:text-soft-cream"
+                  }`}
+                >
+                  {skillsData.visualizationTypes.network.buttonLabel}
+                </button>
+                <button
+                  onClick={() => setVisualizationType("category")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-sm ${
+                    visualizationType === "category" 
+                      ? "bg-theme text-card shadow-md ring-2 ring-theme"
+                      : "bg-elevation-1 text-soft-cream/80 hover:text-soft-cream"
+                  }`}
+                >
+                  {skillsData.visualizationTypes.category.buttonLabel}
+                </button>
+              </div>
+            )}
+
+            {/* Keep category filter always visible */}
             <CategoryFilter
               categories={categories}
               selectedCategory={selectedCategory}
@@ -94,43 +98,39 @@ export default function Skills() {
             />
           </motion.div>
 
+          {/* Grid layout for details and visualization */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <motion.div variants={itemVariants} className="lg:col-span-1 order-2 lg:order-1">
               <SkillDetail skill={selectedSkill} />
             </motion.div>
 
-            <motion.div 
-              variants={itemVariants} 
-              className="lg:col-span-2 h-[500px] md:h-[600px] order-1 lg:order-2 bg-elevation-1 rounded-lg shadow-premium-md overflow-hidden relative"
+            {/* Visualization container - removed fixed height */}
+            <motion.div
+              variants={itemVariants}
+              className="lg:col-span-2 order-1 lg:order-2 bg-elevation-1 rounded-lg shadow-premium-md overflow-hidden relative p-4 md:p-6" // Added padding
             >
-              {isMobile ? (
-                <SkillGalaxySimple
-                  skills={filteredSkills}
-                  onSelectSkill={setSelectedSkill}
-                  selectedSkill={selectedSkill}
-                />
-              ) : (
-                <SkillNetwork 
-                  skills={filteredSkills} 
-                  onSelectSkill={setSelectedSkill} 
-                  selectedSkill={selectedSkill}
-                  visualizationType={visualizationType}
-                />
-              )}
+              {/* Always render SkillNetwork, force category view on mobile */}
+              <SkillNetwork
+                skills={filteredSkills}
+                onSelectSkill={setSelectedSkill}
+                selectedSkill={selectedSkill}
+                visualizationType={isMobile ? "category" : visualizationType}
+              />
             </motion.div>
           </div>
-          
-          <motion.div 
-            variants={itemVariants} 
+
+          {/* Description below visualization - Conditional based on effective type */}
+          <motion.div
+            variants={itemVariants}
             className="mt-12 text-center text-soft-cream/70 text-sm max-w-2xl mx-auto"
           >
-            {visualizationType === "network" ? (
+            {(isMobile || visualizationType === "category") ? (
+              <p>
+                {skillsData.visualizationTypes.category.buttonLabel}
+              </p>
+            ) : ( // Only show network description on desktop when network is selected
               <p>
                 {skillsData.visualizationTypes.network.description}
-              </p>
-            ) : (
-              <p>
-                {skillsData.visualizationTypes.category.description}
               </p>
             )}
           </motion.div>

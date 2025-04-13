@@ -15,7 +15,7 @@ export function SkillDetail({ skill }: SkillDetailProps) {
     development: "bg-[#34BE82]/10 border-[#34BE82]/20 text-[#34BE82]",
     ai: "bg-[#8A2BE2]/10 border-[#8A2BE2]/20 text-[#8A2BE2]",
     database: "bg-[#F4A261]/10 border-[#F4A261]/20 text-[#F4A261]",
-    system: "bg-[#f43f5e]/10 border-[#f43f5e]/20 text-[#f43f5e]",
+    system: "bg-[#f43f5e]/20 border-[#f43f5e]/30 text-[#f43f5e] font-semibold",
   }
 
   const mapProficiency = (proficiency: string | number): string => {
@@ -74,11 +74,19 @@ export function SkillDetail({ skill }: SkillDetailProps) {
                   )}
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-cream">{skill.name}</h4>
-                  <div className="flex items-center gap-2">
-                    <span className={cn("text-xs px-2 py-0.5 rounded-full border", categoryColors[skill.category])}>
-                      {skill.category}
-                    </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-lg font-medium text-cream">{skill.name}</h4>
+                      <span className={cn(
+                        "text-xs px-2.5 py-0.75 rounded-full border-2 shadow-sm", 
+                        categoryColors[skill.category],
+                        skill.category === 'system' ? "animate-pulse" : ""
+                      )}>
+                        {skill.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
                     {renderSkillStatus(skill)}
                   </div>
                 </div>

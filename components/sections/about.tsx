@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"
 import { motion, useInView, AnimatePresence } from "framer-motion"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { StatCounter } from "@/components/ui/stat-counter"
 import { Timeline } from "@/components/ui/timeline"
 import { QuoteCallout } from "@/components/ui/quote-callout"
@@ -31,7 +32,8 @@ const DynamicIcon = ({ name, className }: DynamicIconProps) => {
 
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null)
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
+  const isInView = useInView(sectionRef, { once: true, amount: 0.01 })
+  const isMobile = useMediaQuery("(max-width: 768px)") // Add media query hook
   const [riddlesSolved, setRiddlesSolved] = useState<number[]>([])
   const [currentRiddle, setCurrentRiddle] = useState<number | null>(null)
   const [skipRiddles, setSkipRiddles] = useState(false)
@@ -117,131 +119,144 @@ export default function About() {
               {aboutData.sectionBadge}
             </div>
             <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">{aboutData.title}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              {!skipRiddles && !isAllSolved 
-                ? aboutData.description.riddleState 
-                : aboutData.description.solvedState}
-            </p>
+            {!isMobile && (
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                {!skipRiddles && !isAllSolved 
+                  ? aboutData.description.riddleState 
+                  : aboutData.description.solvedState}
+              </p>
+            )}
           </motion.div>
 
-          {!skipRiddles && !isAllSolved ? (
-          <motion.div variants={itemVariants} className="mb-12">
-              <div className="flex justify-center mb-8">
-                <Button 
-                  variant="outline" 
-                  className="border-theme/30 text-theme hover:bg-theme/10 group flex items-center gap-2"
-                  onClick={handleSkipToInterview}
-                >
-                  <DynamicIcon name={aboutData.skipButton.icon} className="h-4 w-4 group-hover:animate-pulse" />
-                  <span>{aboutData.skipButton.text}</span>
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {riddles.map((riddle) => (
-                  <motion.div 
-                    key={riddle.id}
-                    variants={cardVariants}
-                    whileHover="hover"
-                    className={`bg-elevation-2 rounded-xl p-6 border ${
-                      riddlesSolved.includes(riddle.id) 
-                        ? "border-theme/30" 
-                        : "border-elevation-1"
-                    } shadow-lg cursor-pointer relative overflow-hidden`}
-                    onClick={() => setCurrentRiddle(currentRiddle === riddle.id ? null : riddle.id)}
-                  >
-                    <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-theme/10 blur-xl"></div>
-                    
-                    <div className="flex flex-col items-center text-center relative">
-                      <div className={`w-16 h-16 rounded-full ${
-                        riddlesSolved.includes(riddle.id) 
-                          ? "bg-theme/20" 
-                          : "bg-elevation-3"
-                      } flex items-center justify-center mb-4`}>
-                        <DynamicIcon name={riddle.icon} className="h-8 w-8 text-theme" />
-                      </div>
-                      
-                      <h3 className="text-xl font-bold mb-3 text-cream">{riddle.title}</h3>
-                      
-                      {riddlesSolved.includes(riddle.id) ? (
-                        <div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="w-5 h-5 rounded-full bg-theme/20 flex items-center justify-center mr-1">
-                              <DynamicIcon name="Check" className="h-3 w-3 text-theme" />
-                            </span>
-                            <p className="text-theme text-sm font-medium">{aboutData.riddleUI.solvedStatus}</p>
-                          </div>
-                          <p className="text-soft-cream/80">{riddle.explanation}</p>
-                        </div>
-                      ) : (
-                        <p className="text-soft-cream/90">{riddle.riddle}</p>
-                      )}
-                      
-                      {currentRiddle === riddle.id && !riddlesSolved.includes(riddle.id) && (
-                        <motion.div 
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="mt-4 w-full"
-                        >
-                          <div className="flex items-center space-x-2 mb-3 bg-elevation-3 rounded-lg p-3">
-                            <DynamicIcon name={riddle.hintIcon} className="text-theme" />
-                            <p className="text-soft-cream/90 text-sm">{riddle.hint}</p>
-                          </div>
-                          
-                          <div className="flex flex-col space-y-2">
-                            <input 
-                              type="text" 
-                              placeholder={aboutData.riddleUI.inputPlaceholder}
-                              className="p-2 rounded-lg bg-elevation-3 border border-elevation-1 text-cream focus:border-theme/50 focus:ring-theme/20"
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  const answer = (e.target as HTMLInputElement).value.toLowerCase().trim()
-                                  if (answer === riddle.answer.toLowerCase()) {
-                                    handleSolveRiddle(riddle.id)
-                                  }
-                                }
-                              }}
-                            />
-                            <Button 
-                              size="sm"
-                              variant="outline"
-                              className="border-theme/30 text-theme hover:bg-theme/10"
-                              onClick={() => handleSolveRiddle(riddle.id)}
-                            >
-                              {aboutData.riddleUI.revealButton}
-                            </Button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
+          {/* Conditionally render based on mobile view */}
+          {isMobile ? (
+            // On mobile, show the 'completed' state directly
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="mb-12 bg-elevation-2 rounded-xl p-8 border border-theme/20 shadow-lg"
             >
+              {/* Content of the completed state (same as below) */}
               <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-theme/20 flex items-center justify-center">
-                  <DynamicIcon name={aboutData.completedState.icon} className="h-8 w-8 text-theme" />
-                </div>
-              </div>
-              
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-cream">
-                {skipRiddles ? aboutData.completedState.title.skipped : aboutData.completedState.title.solved}
-              </h3>
-              
-              <div className="space-y-6">
-                {aboutData.completedState.paragraphs.map((paragraph, index) => (
-                  <p key={index} className="text-foreground/90">{paragraph}</p>
-                ))}
-                
-                {skipRiddles && (
+                 <div className="w-16 h-16 rounded-full bg-theme/20 flex items-center justify-center">
+                   <DynamicIcon name={aboutData.completedState.icon} className="h-8 w-8 text-theme" />
+                 </div>
+               </div>
+               <h3 className="text-xl md:text-2xl font-bold mb-4 text-center text-cream">
+                 {aboutData.completedState.title.skipped} {/* Or a specific mobile title? */}
+               </h3>
+               <div className="space-y-6">
+                 {aboutData.completedState.paragraphs.map((paragraph, index) => (
+                   <p key={index} className="text-foreground/90">{paragraph}</p>
+                 ))}
+               </div>
+            </motion.div>
+          ) : (
+            // On desktop, use the original logic
+            !skipRiddles && !isAllSolved ? (
+              <motion.div variants={itemVariants} className="mb-12">
+                  <div className="flex justify-center mb-8">
+                    <Button 
+                      variant="outline" 
+                      className="border-theme/30 text-theme hover:bg-theme/10 group flex items-center gap-2"
+                      onClick={handleSkipToInterview}
+                    >
+                      <DynamicIcon name={aboutData.skipButton.icon} className="h-4 w-4 group-hover:animate-pulse" />
+                      <span>{aboutData.skipButton.text}</span>
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {riddles.map((riddle) => (
+                      <motion.div 
+                        key={riddle.id}
+                        variants={cardVariants}
+                        whileHover="hover"
+                        className={`bg-elevation-2 rounded-xl p-6 border ${
+                          riddlesSolved.includes(riddle.id) 
+                            ? "border-theme/30" 
+                            : "border-elevation-1"
+                        } shadow-lg cursor-pointer relative overflow-hidden`}
+                        onClick={() => setCurrentRiddle(currentRiddle === riddle.id ? null : riddle.id)}
+                      >
+                        <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-theme/10 blur-xl"></div>
+                        
+                        <div className="flex flex-col items-center text-center relative">
+                          <div className={`w-16 h-16 rounded-full ${
+                            riddlesSolved.includes(riddle.id) 
+                              ? "bg-theme/20" 
+                              : "bg-elevation-3"
+                          } flex items-center justify-center mb-4`}>
+                            <DynamicIcon name={riddle.icon} className="h-8 w-8 text-theme" />
+                          </div>
+                          
+                          <h3 className="text-xl font-bold mb-3 text-cream">{riddle.title}</h3>
+                          
+                          {riddlesSolved.includes(riddle.id) ? (
+                            <div>
+                              <div className="flex items-center justify-center mb-2">
+                                <span className="w-5 h-5 rounded-full bg-theme/20 flex items-center justify-center mr-1">
+                                  <DynamicIcon name="Check" className="h-3 w-3 text-theme" />
+                                </span>
+                                <p className="text-theme text-sm font-medium">{aboutData.riddleUI.solvedStatus}</p>
+                              </div>
+                              <p className="text-soft-cream/80">{riddle.explanation}</p>
+                            </div>
+                          ) : (
+                            <p className="text-soft-cream/90">{riddle.riddle}</p>
+                          )}
+                          
+                          {currentRiddle === riddle.id && !riddlesSolved.includes(riddle.id) && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="mt-4 w-full"
+                            >
+                              <div className="flex items-center space-x-2 mb-3 bg-elevation-3 rounded-lg p-3">
+                                <DynamicIcon name={riddle.hintIcon} className="text-theme" />
+                                <p className="text-soft-cream/90 text-sm">{riddle.hint}</p>
+                              </div>
+                              
+                              <div className="flex flex-col space-y-2">
+                                <input 
+                                  type="text" 
+                                  placeholder={aboutData.riddleUI.inputPlaceholder}
+                                  className="p-2 rounded-lg bg-elevation-3 border border-elevation-1 text-cream focus:border-theme/50 focus:ring-theme/20"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      const answer = (e.target as HTMLInputElement).value.toLowerCase().trim()
+                                      if (answer === riddle.answer.toLowerCase()) {
+                                        handleSolveRiddle(riddle.id)
+                                      }
+                                    }
+                                  }}
+                                />
+                                <Button 
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-theme/30 text-theme hover:bg-theme/10"
+                                  onClick={() => handleSolveRiddle(riddle.id)}
+                                >
+                                  {aboutData.riddleUI.revealButton}
+                                </Button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                // Desktop: Solved/skipped state
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-12 bg-elevation-2 rounded-xl p-8 border border-theme/20 shadow-lg"
+                >
                   <div className="mt-6 pt-6 border-t border-elevation-1">
                     <h4 className="text-lg font-medium mb-3 text-cream">{aboutData.completedState.interview.title}</h4>
                     <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -257,11 +272,11 @@ export default function About() {
                       </p>
                     </div>
                   </div>
-                )}
-              </div>
-          </motion.div>
-          )}
+                </motion.div>
+              )
+            )}
 
+          {/* Common sections below riddles/completed state */}
           <motion.div variants={itemVariants} className="mb-12">
             <div className="bg-elevation-2 rounded-xl p-8 border border-elevation-1 shadow-lg relative overflow-hidden">
               <div className="absolute right-0 bottom-0 w-32 h-32 bg-theme/5 rounded-full blur-3xl -mr-10 -mb-10"></div>

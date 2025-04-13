@@ -7,22 +7,31 @@ import { motion } from "framer-motion"
 import { Github, ExternalLink, ChevronRight } from "lucide-react"
 import type { Project } from "@/types/project"
 import { cn } from "@/lib/utils"
+import { useTheme } from "@/context/ThemeContext"
+
+// Category-specific colors aligned with skill visualization
+const categoryColors = {
+  ai: { color: "#8A2BE2", bg: "bg-[#8A2BE2]", textColor: "text-[#8A2BE2]", border: "border-[#8A2BE2]" },
+  cloud: { color: "#4ECDC4", bg: "bg-[#4ECDC4]", textColor: "text-[#4ECDC4]", border: "border-[#4ECDC4]" },
+  development: { color: "#34BE82", bg: "bg-[#34BE82]", textColor: "text-[#34BE82]", border: "border-[#34BE82]" },
+  support: { color: "#FB8B24", bg: "bg-[#FB8B24]", textColor: "text-[#FB8B24]", border: "border-[#FB8B24]" }
+};
 
 interface ProjectCardProps {
   project: Project
   featured?: boolean
 }
 
-// Color mapping for different project categories
-const categoryColors: Record<string, string> = {
-  ai: "#8b5cf6",      // purple
-  cloud: "#3b82f6",   // blue
-  development: "#10b981", // emerald
-  support: "#f59e0b", // amber
-}
-
 export function ProjectCard({ project, featured = false }: ProjectCardProps) {
   const [isFlipped, setIsFlipped] = useState(false)
+  const { currentTheme } = useTheme()
+  
+  // Get category color or fall back to theme color
+  const getCategoryColor = () => {
+    return project.category && categoryColors[project.category] 
+      ? categoryColors[project.category].color
+      : currentTheme.value;
+  };
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped)
@@ -31,6 +40,12 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation()
   }
+
+  // Get the category color for styles
+  const categoryColor = getCategoryColor();
+  const categoryClass = project.category && categoryColors[project.category] 
+    ? categoryColors[project.category]
+    : { textColor: "text-theme", bg: "bg-theme", border: "border-theme" };
 
   return (
     <motion.div 
@@ -49,16 +64,12 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
             "bg-elevation-1 border border-theme/20"
           )}
         >
-          <div className="h-2 w-full" style={{ backgroundColor: categoryColors[project.category] }}></div>
+          <div className="h-2 w-full" style={{ backgroundColor: categoryColor }}></div>
           <div className="p-6 flex flex-col h-full">
             <div className="mb-auto">
               <div className="flex items-center justify-between mb-3">
                 <span 
-                  className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ 
-                    backgroundColor: `${categoryColors[project.category]}20`,
-                    color: categoryColors[project.category] 
-                  }}
+                  className={`text-xs px-2 py-0.5 rounded-full ${categoryClass.bg}/10 ${categoryClass.textColor}`}
                 >
                   {project.category}
                 </span>
@@ -72,7 +83,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {project.technologies.slice(0, 4).map((tech) => (
-                  <span key={tech} className="text-xs px-2 py-0.5 bg-theme/10 text-soft-cream/80 rounded-full">
+                  <span key={tech} className={`text-xs px-2 py-0.5 ${categoryClass.bg}/10 text-soft-cream/80 rounded-full`}>
                     {tech}
                   </span>
                 ))}
@@ -86,7 +97,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
 
             <div className="flex items-center justify-between pt-4 border-t border-soft-cream/10">
               <span className="text-sm text-soft-cream/60">{project.date}</span>
-              <button className="text-sm flex items-center text-theme hover:text-theme/80 transition-colors">
+              <button className={`text-sm flex items-center ${categoryClass.textColor} hover:opacity-80 transition-colors`}>
                 Details <ChevronRight className="h-4 w-4 ml-1" />
               </button>
             </div>
@@ -95,7 +106,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
 
         {/* Back of card */}
         <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden shadow-premium-sm bg-elevation-1 border border-theme/20 rotate-y-180">
-          <div className="h-2 w-full" style={{ backgroundColor: categoryColors[project.category] }}></div>
+          <div className="h-2 w-full" style={{ backgroundColor: categoryColor }}></div>
           <div className="p-6 flex flex-col h-full">
             <h3 className="text-xl font-bold mb-3 text-cream">{project.title}</h3>
 
@@ -108,7 +119,7 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
               <ul className="space-y-1.5">
                 {project.achievements.slice(0, featured ? 4 : 3).map((achievement, index) => (
                   <li key={index} className="flex items-start gap-2 text-sm text-soft-cream/80">
-                    <span className="text-theme mt-1">•</span>
+                    <span className={categoryClass.textColor + " mt-1"}>•</span>
                     <span>{achievement}</span>
                   </li>
                 ))}
@@ -137,7 +148,11 @@ export function ProjectCard({ project, featured = false }: ProjectCardProps) {
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={handleLinkClick}
-                  className="px-3 py-1.5 bg-theme text-black rounded-lg text-sm hover:bg-theme/90 transition-colors flex items-center gap-2"
+                  className="px-3 py-1.5 flex items-center gap-2 rounded-lg text-sm transition-colors"
+                  style={{ 
+                    backgroundColor: categoryColor,
+                    color: "#000"
+                  }}
                 >
                   <ExternalLink className="h-4 w-4" /> Live Demo
                 </a>

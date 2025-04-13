@@ -33,16 +33,22 @@ export function Timeline({ items }: TimelineProps) {
         <div className="flex justify-end mb-6">
           <div className="inline-flex rounded-md shadow-sm">
             <Button
-              variant={viewMode === "vertical" ? "default" : "outline"}
-              className="rounded-l-md rounded-r-none"
+              className={`rounded-l-md rounded-r-none px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                viewMode === "vertical" 
+                  ? "bg-theme text-card shadow-md ring-2 ring-theme" 
+                  : "bg-elevation-1 text-soft-cream/80 hover:text-soft-cream"
+              }`}
               onClick={() => setViewMode("vertical")}
               size="sm"
             >
               Vertical
             </Button>
             <Button
-              variant={viewMode === "horizontal" ? "default" : "outline"}
-              className="rounded-r-md rounded-l-none"
+              className={`rounded-r-md rounded-l-none px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                viewMode === "horizontal" 
+                  ? "bg-theme text-card shadow-md ring-2 ring-theme" 
+                  : "bg-elevation-1 text-soft-cream/80 hover:text-soft-cream"
+              }`}
               onClick={() => setViewMode("horizontal")}
               size="sm"
             >
@@ -58,12 +64,23 @@ export function Timeline({ items }: TimelineProps) {
         !isMobile && <HorizontalTimeline items={items} isInView={isInView} />
       )}
 
-      <div className="flex justify-center mt-10">
-        <Button variant="outline" className="gap-2 border-theme/30 text-theme hover:bg-theme/10">
-          <Code className="h-4 w-4" />
-          Download Resume
+      <motion.div 
+        className="flex justify-center mt-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Button 
+          variant="outline" 
+          className="gap-2 border-theme/30 text-theme hover:bg-theme/10 hover:scale-105 transition-all duration-300 hover:border-theme font-medium rounded-full shadow-sm px-5"
+          asChild
+        >
+          <a href="/resume.pdf" download="Anshuman_Resume.pdf">
+            <Code className="h-4 w-4" />
+            Download Resume
+          </a>
         </Button>
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -107,39 +124,42 @@ function VerticalTimelineItem({ item, index, isInView }: VerticalTimelineItemPro
     >
       <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-0.5 bg-theme/30 transform md:translate-x-px z-0 h-full" />
       
+      {/* Single properly styled circle for the timeline */}
+      <div className="absolute left-3 md:left-1/2 top-5 transform -translate-x-1/2 -translate-y-1/2 z-20">
+        <div className="w-6 h-6 rounded-full bg-background border-4 border-theme shadow-md group-hover:scale-110 transition-transform duration-300"></div>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 0.5, delay: index * 0.2 }}
         className={cn(
-          "relative flex flex-col md:flex-row md:justify-between group",
-        isEven ? "md:flex-row-reverse" : "",
-      )}
-    >
+          "relative flex flex-col md:flex-row group ml-8 md:ml-0", // Add margin-left on mobile
+          isEven ? "md:justify-end" : "md:justify-start"
+        )}
+      >
         <div 
           className={cn(
-            "w-full md:w-5/12 bg-card/80 backdrop-blur-sm rounded-lg p-6 shadow-premium-lg border border-theme/20 transition-all duration-300 relative z-10",
-            expanded ? "md:w-7/12" : "md:w-5/12",
-            "hover:shadow-lg hover:border-theme/30"
+            "w-full bg-card/80 backdrop-blur-sm rounded-lg p-6 shadow-premium-lg border border-theme/20 transition-all duration-300 relative z-10",
+            isEven ? "md:mr-[calc(50%+1rem)]" : "md:ml-[calc(50%+1rem)]", // Adjust desktop positioning based on even/odd
+            "hover:shadow-lg hover:border-theme/30 md:max-w-[calc(50%-1rem)]" // Ensure cards don't overlap line on desktop
           )}
         >
-        <div className="flex items-center mb-2">
-          <div className={cn("flex items-center", isEven ? "md:ml-auto" : "")}>
-              <div className="w-10 h-10 rounded-full bg-theme/10 flex items-center justify-center mr-3">
-            {item.type === "work" ? (
-                  <Briefcase className="h-5 w-5 text-theme" />
-            ) : (
-                  <GraduationCap className="h-5 w-5 text-theme" />
-            )}
-              </div>
-              <h4 className="text-lg font-bold text-cream">{item.title}</h4>
+          <div className="flex items-center mb-2">
+            <div className="w-10 h-10 rounded-full bg-theme/10 flex items-center justify-center mr-3 flex-shrink-0">
+              {item.type === "work" ? (
+                <Briefcase className="h-5 w-5 text-theme" />
+              ) : (
+                <GraduationCap className="h-5 w-5 text-theme" />
+              )}
+            </div>
+            <h4 className="text-lg font-bold text-cream">{item.title}</h4>
           </div>
-        </div>
 
-          <div className={cn("flex items-center text-sm text-soft-cream/70 mb-3", isEven ? "md:justify-end" : "")}>
-          <CalendarDays className="h-4 w-4 mr-1" />
-          <span>{item.date}</span>
-        </div>
+          <div className="flex items-center text-sm text-soft-cream/70 mb-3">
+            <CalendarDays className="h-4 w-4 mr-1" />
+            <span>{item.date}</span>
+          </div>
 
           <p className="text-soft-cream/90 font-medium mb-3">{item.company}</p>
           <p className="text-soft-cream/80 mb-4">{item.description}</p>
@@ -250,15 +270,7 @@ function VerticalTimelineItem({ item, index, isInView }: VerticalTimelineItemPro
             )}
           </button>
         </div>
-
-        <div
-          className={cn(
-          "absolute top-0 w-6 h-6 rounded-full bg-background border-4 border-theme shadow-md transform -translate-y-1/2 z-20",
-          "group-hover:scale-110 transition-transform duration-300",
-          isEven ? "md:right-1/2 md:-translate-x-1/2" : "left-0 md:left-1/2 md:-translate-x-1/2"
-        )}
-      />
-    </motion.div>
+      </motion.div>
     </div>
   )
 }
@@ -329,6 +341,7 @@ function HorizontalTimelineItem({ item, index, isInView }: HorizontalTimelineIte
       transition={{ duration: 0.5, delay: index * 0.15 }}
       className="flex-shrink-0 w-80 bg-card/80 backdrop-blur-sm rounded-lg p-6 shadow-premium-lg border border-theme/20 relative group transition-all duration-300 hover:shadow-lg hover:border-theme/30"
     >
+      {/* Improved circle styling and positioning for consistency */}
       <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-background border-4 border-theme shadow-md z-10 group-hover:scale-110 transition-transform duration-300" />
       <div className="absolute top-[2px] left-0 right-0 h-0.5 bg-theme/30 -translate-y-[1px]" />
 

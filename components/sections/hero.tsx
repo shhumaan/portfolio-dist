@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { ArrowDown, ArrowRight } from "lucide-react"
+import { ArrowDown, ArrowRight, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll"
 import { useWebGLSupport } from "@/hooks/use-webgl-support"
@@ -202,6 +202,19 @@ export default function Hero() {
                 className="border-theme/30 text-cream hover:text-theme hover:bg-theme/10 font-medium rounded-full"
               >
                 {heroData.buttons.contact}
+              </Button>
+            </motion.div>
+            
+            <motion.div variants={buttonVariants} whileHover="hover">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-theme/30 text-cream hover:text-theme hover:bg-theme/10 font-medium rounded-full"
+                asChild
+              >
+                <a href="/resume.pdf" download="Anshuman_Resume.pdf">
+                  Resume <Download className="ml-2 h-4 w-4" />
+                </a>
               </Button>
             </motion.div>
           </motion.div>

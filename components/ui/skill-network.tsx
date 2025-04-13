@@ -156,48 +156,59 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
     // Function to render the network graph
     function renderNetworkGraph() {
       if (!containerRef.current || !svgRef.current) return;
-
-      // Get container dimensions
-      const width = containerRef.current.clientWidth;
-      const height = containerRef.current.clientHeight;
-
-      if (width === 0 || height === 0) {
-        return;
-      }
-
-      // Create SVG with zoom capabilities
-      const svg = d3.select(svgRef.current)
-        .attr("width", width)
-        .attr("height", height);
-
-      // Function to show/hide labels based on zoom level
+      
+      // Get container dimensions and clear SVG
+      const container = containerRef.current;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      
+      if (width === 0 || height === 0) return;
+      
+      // Clear existing content
+      const svg = d3.select(svgRef.current);
+      svg.selectAll("*").remove();
+      
+      // Set SVG dimensions
+      svg.attr("width", width)
+         .attr("height", height);
+      
+      // Create strict viewBox to enforce boundaries
+      svg.attr("viewBox", `0 0 ${width} ${height}`);
+      svg.attr("preserveAspectRatio", "xMidYMid meet");
+      
+      // Add clip path to enforce boundaries
+      const defs = svg.append("defs");
+      defs.append("clipPath")
+          .attr("id", "skill-graph-clip")
+          .append("rect")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("x", 0)
+          .attr("y", 0);
+      
+      // Create main group with clipping path applied
+      const g = svg.append("g")
+          .attr("clip-path", "url(#skill-graph-clip)");
+      
+      // Function to update label visibility based on zoom
       function updateLabelsVisibility(transform: d3.ZoomTransform | null) {
         const scale = transform ? transform.k : 1;
-        
-        // Show detailed labels only when zoomed in enough
         svg.selectAll(".node-label")
-          .style("opacity", scale > 1.2 ? 1 : 0);
+           .style("opacity", scale > 1.2 ? 1 : 0);
       }
       
-      // Add zoom behavior
+      // Add zoom behavior with proper typing
       const zoom = d3.zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.5, 3])
-        .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
-          g.attr("transform", event.transform.toString());
-          updateLabelsVisibility(event.transform);
-        });
+          .scaleExtent([0.5, 2])
+          .on("zoom", (event) => {
+            g.attr("transform", event.transform.toString());
+            updateLabelsVisibility(event.transform);
+          });
       
       svg.call(zoom);
-      
-      // Create a group for all elements to enable zooming
-      const g = svg.append("g")
-        .attr("class", "everything");
-        
-      // Initialize label visibility
       updateLabelsVisibility(null);
-        
+      
       // Add subtle background pattern - use CSS variables
-      const defs = g.append("defs");
       const pattern = defs.append("pattern")
         .attr("id", "skill-grid-pattern")
         .attr("width", 40)
@@ -291,26 +302,30 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
       console.log("Nodes created:", nodes.length);
       console.log("Links created:", links.length);
       
-      // Create a simulation with improved force parameters
+      // Modify the simulation to enforce boundaries with proper typing
       const simulation = d3.forceSimulation<NodeData, LinkData>(nodes)
         .force("link", d3.forceLink<NodeData, LinkData>(links)
           .id(d => d.id)
-          .distance(d => 120) // Fixed distance for clearer visualization
-          .strength(0.3)  // Reduced link strength for better distribution
-        )
+          .distance(d => 80) // Reduced distance
+          .strength(0.3))
         .force("charge", d3.forceManyBody<NodeData>()
-          .strength(d => -400)  // Stronger repulsion to spread nodes apart
-          .distanceMax(350)     // Limit the distance of repulsive effect
-        )
+          .strength(d => -200) // Less repulsion
+          .distanceMax(200))
         .force("collide", d3.forceCollide<NodeData>()
-          .radius(d => d.r * 2)  // Increased collision radius
-          .strength(0.9)        // Increased collision strength
-        )
+          .radius(d => d.r * 1.2)
+          .strength(1)) // Higher collision strength
         .force("center", d3.forceCenter(width / 2, height / 2)
-          .strength(0.05)  // Weaker centering force to allow better spreading
-        )
-        .force("x", d3.forceX(width / 2).strength(0.03)) // Gentle force toward horizontal center
-        .force("y", d3.forceY(height / 2).strength(0.03)); // Gentle force toward vertical center
+          .strength(0.15))
+        // Custom boundary force
+        .force("boundary", () => {
+          nodes.forEach(node => {
+            const r = node.r || 10;
+            if (node.x !== undefined && node.x < r) node.x = r + 5;
+            if (node.x !== undefined && node.x > width - r) node.x = width - r - 5;
+            if (node.y !== undefined && node.y < r) node.y = r + 5; 
+            if (node.y !== undefined && node.y > height - r) node.y = height - r - 5;
+          });
+        });
       
       // Store the simulation reference to access it in cleanup
       simulationRef.current = simulation;
@@ -990,8 +1005,16 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
                       whileHover={{ scale: 1.05 }}
                       onClick={() => onSelectSkill(skill)}
                       className={`relative flex flex-col items-center p-3 rounded-lg bg-black/30 cursor-pointer
-                        ${selectedSkill?.id === skill.id ? 'ring-2 ring-premium-green' : ''}`}
+                        ${selectedSkill?.id === skill.id ? 'ring-2 ring-theme' : ''}`}
                     >
+                      {/* Category badge positioned top-right */}
+                      <div 
+                        className="absolute top-1 right-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full z-10" 
+                        style={{backgroundColor: categoryColors[skill.category]}}
+                      >
+                        {skill.category}
+                      </div>
+                      
                       {/* Circular progress indicator */}
                       <div className="relative w-16 h-16 mb-2">
                         <svg className="w-full h-full" viewBox="0 0 36 36">
@@ -1065,14 +1088,16 @@ export function SkillNetwork({ skills, onSelectSkill, selectedSkill, visualizati
         exit={{ opacity: 0, y: 20 }}
         className="absolute bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-md text-slate-100 p-4 rounded-t-xl shadow-xl z-50"
       >
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-medium">{selectedSkill.name}</h3>
-          <span 
-            className="text-xs font-medium px-2 py-1 rounded-full" 
-            style={{backgroundColor: categoryColors[selectedSkill.category]}}
-          >
-            {selectedSkill.category}
-          </span>
+        <div className="flex items-center">
+          <h3 className="text-xl font-medium flex items-center gap-2">
+            {selectedSkill.name}
+            <span 
+              className="text-xs font-medium px-2 py-1 rounded-full" 
+              style={{backgroundColor: categoryColors[selectedSkill.category]}}
+            >
+              {selectedSkill.category}
+            </span>
+          </h3>
         </div>
         
         <div className="mt-2 text-sm text-slate-300">{selectedSkill.description}</div>
